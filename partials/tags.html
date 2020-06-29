@@ -1,0 +1,5 @@
+{{- with partial "tnd-seo/private/GetTags" . -}}
+  {{- range . }}
+{{ partialCached "tnd-tags/tag" . . }}
+  {{- end -}}
+{{- end -}}

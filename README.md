@@ -1,8 +1,8 @@
 This is a template repo. To start.
 
-search `{moduleName}` through the project and replace it with the module identifier (ex: `socials` for `hugo-module-tnd-socials`)
+search `seo` through the project and replace it with the module identifier (ex: `socials` for `hugo-module-tnd-socials`)
 
-# {moduleName} Hugo Module
+# seo Hugo Module
 
 (intro)
 
@@ -10,7 +10,7 @@ search `{moduleName}` through the project and replace it with the module identif
 
 Requirements:
 - Go 1.14
-- Hugo 0.61.0
+- Hugo 0.54.0
 
 
 ## Installation
@@ -18,7 +18,7 @@ Requirements:
 If not already, [init](https://gohugo.io/hugo-modules/use-modules/#initialize-a-new-module) your project as Hugo Module:
 
 ```
-$: hugo mod init {repo_url}
+$: hugo mod init github.com/theNewDynamic/hugo-module-tnd-seo
 ```
 
 Configure your project's module to import this module:
@@ -27,10 +27,20 @@ Configure your project's module to import this module:
 # config.yaml
 module:
   imports:
-  - path: github.com/theNewDynamic/hugo-module-tnd-{moduleName}
+  - path: github.com/theNewDynamic/hugo-module-tnd-seo
 ```
 
 ## Usage
+
+Drop the following where appropriate
+```
+{{ if templates.Exists "partials/tnd-seo/print.html" }}
+  {{ partial "tnd-seo/tags.html" . }}
+{{ end }}
+```
+
+The above partials, will look for content information and build an Data object to be printed in SEO tags (og, twitter card etc...).
+If you need to alternate the data model, you can do so by adding ot your project a `layouts/partials/tnd-seo/extend.html` partial and add to it as explained [here](/layouts/partials/tnd-seo/extend.html).
 
 ### Some Partial/Feature
 
@@ -38,30 +48,38 @@ module:
 
 ### Settings
 
-Settings are added to the project's parameter under the `tnd_{moduleName}` map as shown below.
+Settings are added to the project's parameter under the `tnd_seo` map as shown below.
 
 ```yaml
 # config.yaml
 params:
-  tnd_{moduleName}:
-    [...]
+  tnd_seo:
+    # overides .Site.Title
+    site_name: MyWebsite 
+    # Used for articles without images
+    default_image: "/images/default.jpg"
+    # if true will use the SEO data object to output an json+ld script tag.
+    jsonld: true
+    # if true will display a human readable overlay on everypage to monitor SEO data object (only if dev != production)
+    debug: true
 ```
 
 #### Configure Key 1
 
 #### Configure Key 2
 
-Given the example above, passing the following arguments to `tnd-imgix/GetSRC`
+### Front Matter
+
+The following can be overriden just for SEO within the Front Matter:
+
 ```
-{{ $src := "/uploads/an-image.jpg" }}
-{{ $args := dict "src" $src "width" 1024 "pixel" 2 "ch" "Width,DPR" }}
+---
+title: What a post
+description: That's dull!
+seo:
+  image: /uploads/way-better-that-this-post-featured.png
+  description: Content marketing 101
 ```
-
-Will produce: `https://imgix.domain.com/image.jpg?w=1024&dpr=2&ch=Width,DPR`
-
-#### Defaults
-
-ld copy/paste the above to your settings and append with new extensions.
 
 ## theNewDynamic
 

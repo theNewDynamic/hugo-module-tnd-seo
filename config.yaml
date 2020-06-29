@@ -2,5 +2,7 @@ module:
   hugoVersion:
     min: "0.61.0"
   mounts:
-  - source: partials
-    target: layouts/partials/tnd-{moduleName}
+    source: partials
+    target: layouts/partials/tnd-seo
+  imports:
+  - path: github.com/theNewDynamic/hugo-module-tnd-tags

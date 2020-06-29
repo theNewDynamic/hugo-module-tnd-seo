@@ -1,0 +1,198 @@
+{{/* 
+	Structure SEO Data for a given page
+	+ print tags
+	+ print jsonld
+	
+	@author The New Dynamic
+	
+	@access public
+
+	@context Page 
+
+	@example - Go Template
+		{{ partial "tnd-seo/tags" . }}
+
+  TODO:
+    - [ ] Improve type test on "events", `article` seems very opinated.
+		- [ ] Find a reasonable default image when `site.Params.default_image` is not set.
+		- [ ] Twitter can sport "author" handle on top of the site's. Devise a test for author? 
+		- [ ] Maybe consider another approach to set the twitter_card (summary, etc...)
+		- [ ] Not sure about image size. Following https://docs.imgix.com/best-practices/improving-seo-traffic, we have a 
+			square of 800x800 */}}
+
+ 
+{{/*------------------------------
+	BUILDING SCRATCH SEO OBJECT
+	------------------------------ */}}
+
+{{/* Adding the seo map to scratch which will recieve SEO key/value pairs. */}}
+{{ $s := newScratch }}
+{{ $s.Set "seo" dict  }}
+
+{{/* Dates
+	----------------------------- */}}
+
+{{  if not .PublishDate.IsZero  }}
+{{  $s.SetInMap "seo" "published_time" (.PublishDate.Format "2006-01-02T15:04:05-07:00")  }}
+{{  else if not .Date.IsZero  }}
+{{  $s.SetInMap "seo" "published_time" (.Date.Format "2006-01-02T15:04:05-07:00")  }}
+{{  end  }}
+{{  if not .Lastmod.IsZero  }}
+{{  $s.SetInMap "seo" "updated_time" (.Lastmod.Format "2006-01-02T15:04:05-07:00")  }}
+{{  end  }}
+
+ 
+{{/* Description
+	---------------------------- 
+	We use the following order of precedence
+	1. SEO Description, then, if not found,
+	2. Description, then if not found,
+	3. Summary then, if not found,
+	4. site description  */}}
+{{ $description := "" }}
+{{/* 1. SEO Description */}}
+{{  if .Params.seo.description  }}
+	{{  $description = .Params.seo.description  }}
+{{/* 2. Description
+	    As it could potentially contain HTML tags, we strip them with plainify */}}
+{{  else if .Params.description  }}
+	{{  $description = .Params.description | plainify  }}
+{{/* 3. Summary  */}}
+{{  else if .Summary  }}
+	{{  $description = .Summary  }}
+{{  else  }}
+{{/* 4. site description  */}}
+	{{ $description = .Site.Params.Description }}
+{{  end  }}
+
+{{  $s.SetInMap "seo" "description" $description  }}
+ 
+{{/* Title
+  ---------------------------- 
+	We use the following logic
+	1. Every pages: `{.Title} | {.Site.Title}`
+	2. Homepage: , only {.Site.Title} */}}
+{{  if not .IsHome  }}
+	{{/* 1. `{.Title} | {.Site.Title}` */}}
+	{{  $s.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title )  }}
+{{  else  }}
+	{{/* 2. `{.Site.Title}` */}}
+	{{  $s.SetInMap "seo" "title" .Site.Title  }}
+{{  end  }}
+
+{{/* Site Name
+	---------------------------- */}}
+{{  with $.Param "seo.site_name"  }}
+	{{  $s.SetInMap "seo" "site_name" .  }}
+{{  else  }}
+	{{  $s.SetInMap "seo" "site_name" .Site.Title  }}
+{{  end  }}
+
+{{/* Image
+	---------------------------- */}}
+{{ $img := false }}
+
+{{  with .Site.Params.seo.default_image  }}
+	{{  $img = .  }}
+{{  end  }}
+
+{{  with .Params.seo.image  }}
+	{{  $img = .  }}
+{{ else }}
+	{{/* If no SEO IMAGE is set, we look for the .Params.images slice
+		and use the first one if it has an `image` key */}}
+	{{  with .Params.images  }}
+		{{  with index . 0  }}
+			{{ if reflect.IsMap . }}
+				{{  with .image  }}
+					{{  $img = .  }}
+				{{  end  }}
+			{{ else }}
+				{{  $img = .  }}
+			{{ end }}
+		{{  end  }}
+	{{  end  }}
+{{  end  }}
+
+{{ with $img }}
+	{{/* imgx: 
+		If we find an `image_url` in site config, it means we're using imgx.
+		We can therefor safely add an imgx query to the image url. */}}
+	{{  with $.Site.Params.image_url  }}
+		{{  $query := querify "w" "800" "fit" "crop"  }}
+		{{/* If the project has the `image-src-imgx` partial we use it to transform the url */}}
+		{{ if templates.Exists "partials/_components/image-src-imgx.html" }}
+			{{ $img = partialCached "_components/image-src-imgx" (dict "src" $img "query" $query) $img $query }}
+		{{/* If the project has new _images/src partial, we use it instead */}}
+		{{ else if templates.Exists "partials/_images/src.html" }}
+			{{ $img = partialCached "_images/src" $img $img }}
+			{{ $img = add $img "?" }}
+			{{ $img = add $img $query }}
+		{{ end }}
+	{{  end  }}
+{{ end }}
+
+{{/* Finally if after all of the conditional above we are not able to find an image for the page,
+	we resolve to looking for the following: */}}
+{{ if not true }}
+	{{  $img_defaults := slice "/static/logo.jpg" "/static/logo.png" "/uploads/default.jpg"  }}
+	{{ range $path := $img_defaults }}
+		{{ if fileExists . }}
+			{{ $img = strings.TrimLeft "/static" $path }}
+		{{ end }}
+	{{ end }}
+{{ end }}
+
+{{ with $img }}
+	{{  $s.SetInMap "seo" "image" (. | absURL)  }}	
+{{ end }}
+
+{{/* Twitter
+	---------------------------- */}}
+{{ with $img }}
+	{{/* Most of the time we should have an image */}}
+	{{  $s.SetInMap "seo" "twitter_card" "summary_large_image"  }}
+{{ else }}
+	{{/* For edge cases without: */}}
+	{{  $s.SetInMap "seo" "twitter_card" "summary"  }}
+{{ end }}
+
+
+{{/* We check the site config sports a Social.twitter and use as handle */}}
+{{  with .Site.Social.twitter  }}
+	{{  $s.SetInMap "seo" "twitter_handle" (printf "@%s" .)  }}
+{{  end  }}
+
+
+{{/* Type
+	---------------------------- */}}
+{{  $s.SetInMap "seo" "type" "website"  }}
+
+{{  if in (slice "blog" "news") .Type  }}
+	{{  $s.SetInMap "seo" "type" "article"  }}
+{{ else if in (slice "article") .Type }}
+	{{  $s.SetInMap "seo" "type" "event"  }}
+{{  end  }}
+
+
+
+
+{{/* Locale
+	---------------------------- */}}
+{{  $s.SetInMap "seo" "locale" "en_US"  }}
+
+{{/* Canonical
+---------------------------- */}}
+{{ with .Params.seo.canonical }}
+  {{  $s.SetInMap "seo" "canonical" (. | absURL)  }}
+{{ else }}
+{{  $s.SetInMap "seo" "canonical" .Permalink  }}
+{{ end }}
+
+{{ $seo := $s.Get "seo" }}
+{{ if templates.Exists "partials/tnd-seo/AddSEOData.html" }}
+  {{ $seo = partial "tnd-seo/AddSEOData" (dict "seo" $seo "Page" $) }}
+{{ end }}
+
+
+{{ return $seo }}

@@ -1,0 +1,78 @@
+{{/* 
+	Print SEO meta tags 
+	
+	@author The New Dynamic
+	
+	@access private
+
+	@context map [page (Page), seo (Map)] */}}
+
+{{/*------------------------------
+	WRITING TAGS
+	------------------------------ */}}
+{{- $seo := partial "tnd-seo/private/GetSEOData" $ -}}
+
+{{ $tags := slice }}
+{{ with $seo.title }}
+  {{ $tags = $tags | append (dict "name" "title" "inner" .) }}
+  {{ $tags = $tags | append (partial "tnd-seo/tag/all" (dict "key" "title" "value" .)) }}
+{{ end }}
+
+{{ with $seo.description }}
+  {{ $tags = $tags | append (partial "tnd-seo/tag/default" (dict "key" "description" "value" .)) }}
+  {{ $tags = $tags | append (partial "tnd-seo/tag/all" (dict "key" "description" "value" .)) }}
+{{ end }}
+
+{{ with $.Permalink }}
+{{ $tags = $tags | append (partial "tnd-seo/tag/all" (dict "key" "url" "value" .)) }}
+{{ end }}
+
+{{ with $seo.site_name }}
+  {{ $c := dict "key" "site_name" "value" . }}
+  {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
+{{ end }}
+
+{{ with $seo.local }}
+{{ $c := dict "key" "local" "value" .}}
+  {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
+{{ end }}
+{{ with "website" }}
+{{ $c := dict "key" "type" "value" "website" }}
+{{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
+{{ end }}
+
+
+{{ range $key := slice "published_time" "updated_time" }}
+  {{ with index $seo . }}
+  {{ $tags = $tags | append (partial "tnd-seo/tag/og" (dict "key" $key "value" .)) }}
+  {{ end }}
+{{ end }}
+
+{{ with $seo.image }}
+  {{ $c := dict "key" "image" "value" . }}
+  {{ $tags = $tags | append (partialCached "tnd-seo/tag/all" $c $c) }}
+  {{ with $seo.image_width }}
+    {{ $tags = $tags | append (partial "tnd-seo/tag/og" (dict "key" "image:width" "value" .)) }}
+  {{ end }}
+  {{ with $seo.image_height }}
+    {{ $tags = $tags | append (partial "tnd-seo/tag/og" (dict "key" "image:height" "value" .)) }}  
+  {{ end }}
+{{ end }}
+
+{{ with $seo.twitter_card }}
+{{ $c := dict "key" "twitter_card" "value" . }}
+{{ $tags = $tags | append (partialCached "tnd-seo/tag/twitter" $c $c) }}
+{{ end }}
+
+{{ with $seo.canonical }}
+  {{ $tags = $tags | append (partial "tnd-seo/tag/default" (dict "key" "canonical" "value" .)) }}
+{{ end }}
+
+{{ with $seo.twitter_handle }}
+  {{ $c := dict "key" "site" "value" . }}
+  {{ $tags = $tags | append (partialCached "tnd-seo/tag/twitter" $c $c) }}
+  {{ $c2 := dict "key" "creator" "value" . }}
+  {{ $tags = $tags | append (partialCached "tnd-seo/tag/twitter" $c2 $c2) }}
+{{ end }}
+
+{{ return $tags }}
