@@ -75,4 +75,9 @@
   {{ $tags = $tags | append (partialCached "tnd-seo/tag/twitter" $c2 $c2) }}
 {{ end }}
 
+{{ with $seo.jsonld }}
+  {{ $c := dict "name" "script" "inner" (. | jsonify | safeJS) "attr" (dict "type" "application/ld+json") }}
+  {{ $tags = $tags | append $c }}
+{{ end }}
+
 {{ return $tags }}

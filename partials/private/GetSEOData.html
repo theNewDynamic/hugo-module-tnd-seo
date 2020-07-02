@@ -194,5 +194,21 @@
   {{ $seo = partial "tnd-seo/AddSEOData" (dict "seo" $seo "Page" $) }}
 {{ end }}
 
+{{ if site.Params.tnd_seo.jsonld }}
+	{{ with $seo }}
+		{{ $s.SetInMap "jsonld" "@context"  "https://schema.org" }}
+		{{ $s.SetInMap "jsonld" "@type"  .type }}
+		{{ $s.SetInMap "jsonld" "headline" $.Title }}
+		{{ $s.SetInMap "jsonld" "image" .image }}
+		{{ $s.SetInMap "jsonld" "wordcount"  ($.WordCount | string) }}
+		{{ $s.SetInMap "jsonld" "url"  $.Permalink }}
+		{{ $s.SetInMap "jsonld" "datePublished" .published_time }}
+		{{ $s.SetInMap "jsonld" "dateModified" .updated_time }}
+		{{ $s.SetInMap "jsonld" "description" .description }}
+	{{ end }}
+	{{ with $s.Get "jsonld" }}
+		{{ $seo = merge $seo (dict "jsonld" .) }}
+	{{ end }}
+{{ end }}
 
 {{ return $seo }}
