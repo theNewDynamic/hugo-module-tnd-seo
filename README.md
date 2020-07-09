@@ -1,6 +1,6 @@
-# seo Hugo Module
+# TND SEO Hugo Module
 
-(intro)
+Hugo Module to quickly add sensible -- yet highly extendable -- SEO/opengraph metatags.  
 
 ## Requirements
 
@@ -30,17 +30,13 @@ module:
 
 Drop the following where appropriate
 ```
-{{ if templates.Exists "partials/tnd-seo/print.html" }}
+{{ if templates.Exists "partials/tnd-seo/tags.html" }}
   {{ partial "tnd-seo/tags.html" . }}
 {{ end }}
 ```
 
 The above partials, will look for content information and build an Data object to be printed in SEO tags (og, twitter card etc...).
 If you need to alternate the data model, you can do so by adding ot your project a `layouts/partials/tnd-seo/extend.html` partial and add to it as explained [here](/layouts/partials/tnd-seo/extend.html).
-
-### Some Partial/Feature
-
-#### Examples
 
 ### Settings
 
@@ -56,13 +52,7 @@ params:
     default_image: "/images/default.jpg"
     # if true will use the SEO data object to output an json+ld script tag.
     jsonld: true
-    # if true will display a human readable overlay on everypage to monitor SEO data object (only if dev != production)
-    debug: true
 ```
-
-#### Configure Key 1
-
-#### Configure Key 2
 
 ### Front Matter
 
@@ -76,6 +66,10 @@ seo:
   image: /uploads/way-better-that-this-post-featured.png
   description: Content marketing 101
 ```
+
+### Extend SEO Data
+
+In order to customize the SEO Data consumed by Hugo to build the tags. User can create on the project level a `tnd-seo/AddSEOData` partial.
 
 ## theNewDynamic
 
