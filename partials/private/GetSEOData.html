@@ -114,24 +114,6 @@
 	{{  end  }}
 {{  end  }}
 
-{{ with $img }}
-	{{/* imgx: 
-		If we find an `image_url` in site config, it means we're using imgx.
-		We can therefor safely add an imgx query to the image url. */}}
-	{{  with $.Site.Params.image_url  }}
-		{{  $query := querify "w" "800" "fit" "crop"  }}
-		{{/* If the project has the `image-src-imgx` partial we use it to transform the url */}}
-		{{ if templates.Exists "partials/_components/image-src-imgx.html" }}
-			{{ $img = partialCached "_components/image-src-imgx" (dict "src" $img "query" $query) $img $query }}
-		{{/* If the project has new _images/src partial, we use it instead */}}
-		{{ else if templates.Exists "partials/_images/src.html" }}
-			{{ $img = partialCached "_images/src" $img $img }}
-			{{ $img = add $img "?" }}
-			{{ $img = add $img $query }}
-		{{ end }}
-	{{  end  }}
-{{ end }}
-
 {{/* Finally if after all of the conditional above we are not able to find an image for the page,
 	we resolve to looking for the following: */}}
 {{ if not true }}
@@ -142,10 +124,10 @@
 		{{ end }}
 	{{ end }}
 {{ end }}
-
 {{ with $img }}
-	{{  $s.SetInMap "seo" "image" (. | absURL)  }}	
+	{{  $s.SetInMap "seo" "image" (. | absURL) }}
 {{ end }}
+
 
 {{/* Twitter
 	---------------------------- */}}
@@ -163,6 +145,9 @@
 	{{  $s.SetInMap "seo" "twitter_handle" (printf "@%s" .)  }}
 {{  end  }}
 
+{{ with $.Params.seo.private }}
+{{  $s.SetInMap "seo" "private" true }}
+{{ end }}
 
 {{/* Type
 	---------------------------- */}}
@@ -209,6 +194,12 @@
 	{{ with $s.Get "jsonld" }}
 		{{ $seo = merge $seo (dict "jsonld" .) }}
 	{{ end }}
+{{ end }}
+
+{{ with $.Params.seo.private }}
+	{{ $s.SetInMap "seo" "private" true }}
+{{ else }}
+	{{ $s.SetInMap "seo" "private" false }}
 {{ end }}
 
 {{ return $seo }}
