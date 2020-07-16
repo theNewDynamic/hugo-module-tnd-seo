@@ -9,8 +9,11 @@
 
 {{/*------------------------------
 	WRITING TAGS
-	------------------------------ */}}
-{{- $seo := partial "tnd-seo/private/GetSEOData" $ -}}
+  ------------------------------ */}}
+  
+{{ $config := partialCached "tnd-seo/private/GetConfig" "tnd-seo/GetConfig" }}
+
+{{ $seo := partial "tnd-seo/private/GetSEOData" $ }}
 
 {{ $tags := slice }}
 {{ with $seo.title }}
@@ -77,6 +80,17 @@
 
 {{ with $seo.jsonld }}
   {{ $c := dict "name" "script" "inner" (. | jsonify | safeJS) "attr" (dict "type" "application/ld+json") }}
+  {{ $tags = $tags | append $c }}
+{{ end }}
+
+{{/* Dealing with private setting */}}
+{{ with $config.enable_follow }}
+  {{ $value := "noindex, nofollow" }}
+  {{ $production := eq (getenv "HUGO_ENV") "production" }}
+  {{ if and $production (not $seo.private) }}
+    {{ $value = "index, follow" }}
+  {{ end }}
+  {{ $c := dict "name" "meta" "attr" (dict "content" $value) }}
   {{ $tags = $tags | append $c }}
 {{ end }}
 

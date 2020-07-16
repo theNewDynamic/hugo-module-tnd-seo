@@ -52,6 +52,8 @@ params:
     default_image: "/images/default.jpg"
     # if true will use the SEO data object to output an json+ld script tag.
     jsonld: true
+    # if true module will handle follow/nofollow tags for pages depending on environment and Front Matter setting.
+    enable_follow: false
 ```
 
 ### Front Matter
@@ -66,6 +68,22 @@ seo:
   image: /uploads/way-better-that-this-post-featured.png
   description: Content marketing 101
 ```
+
+#### Private
+Any page can be set to private. For this feature to work, you need to set `enable_follow` to true.
+
+```
+title: Editors Only
+seo:
+  private: true
+```
+
+The page above, when in production will sport the nofollow/noindex meta tag. 
+
+Note: If `enable_follow` is set to `true`, the module will print a `nofollow, noindex` tag for every pages unless
+- The environment variable `HUGO_ENV` value is `production`
+- AND 
+- `seo.private` is not set or equals to `false` 
 
 ### Extend SEO Data
 
