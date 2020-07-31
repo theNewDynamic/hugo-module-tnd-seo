@@ -92,7 +92,7 @@
 	---------------------------- */}}
 {{ $img := false }}
 
-{{  with .Site.Params.seo.default_image  }}
+{{  with site.Params.tnd_seo.default_image  }}
 	{{  $img = .  }}
 {{  end  }}
 
@@ -128,7 +128,7 @@
 	{{  $s.SetInMap "seo" "image" (. | absURL) }}
 {{ end }}
 
-
+{{ warnf "%s: %s" $.Title $img }}
 {{/* Twitter
 	---------------------------- */}}
 {{ with $img }}
