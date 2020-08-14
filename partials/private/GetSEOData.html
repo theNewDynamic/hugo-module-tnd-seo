@@ -182,7 +182,7 @@
 	{{ with $seo }}
 		{{ $s.SetInMap "jsonld" "@context"  "https://schema.org" }}
 		{{ $s.SetInMap "jsonld" "@type"  .type }}
-		{{ $s.SetInMap "jsonld" "headline" $.Title }}
+		{{ $s.SetInMap "jsonld" "headline" .title }}
 		{{ $s.SetInMap "jsonld" "image" .image }}
 		{{ $s.SetInMap "jsonld" "wordcount"  ($.WordCount | string) }}
 		{{ $s.SetInMap "jsonld" "url"  $.Permalink }}
