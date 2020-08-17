@@ -51,34 +51,38 @@
 	4. site description  */}}
 {{ $description := "" }}
 {{/* 1. SEO Description */}}
-{{  if .Params.seo.description  }}
-	{{  $description = .Params.seo.description  }}
+{{ if .Params.seo.description  }}
+	{{ $description = .Params.seo.description }}
 {{/* 2. Description
 	    As it could potentially contain HTML tags, we strip them with plainify */}}
-{{  else if .Params.description  }}
-	{{  $description = .Params.description | plainify  }}
+{{ else if .Params.description }}
+	{{ $description = .Params.description | plainify }}
 {{/* 3. Summary  */}}
-{{  else if .Summary  }}
-	{{  $description = .Summary  }}
+{{ else if .Summary }}
+	{{ $description = .Summary }}
 {{  else  }}
 {{/* 4. site description  */}}
-	{{ $description = .Site.Params.Description }}
-{{  end  }}
+	{{ $description = site.Params.Description }}
+{{ end  }}
 
-{{  $s.SetInMap "seo" "description" $description  }}
+{{ $s.SetInMap "seo" "description" $description }}
  
 {{/* Title
   ---------------------------- 
 	We use the following logic
-	1. Every pages: `{.Title} | {.Site.Title}`
-	2. Homepage: , only {.Site.Title} */}}
-{{  if not .IsHome  }}
+	1. Every pages: `{.Title} | {site.Title}`
+	2. Homepage: , only {site.Title} */}}
+{{ $title := .Title }}
+{{ with .Params.seo.title }}
+	{{ $title = . }}
+{{ end }}
+{{ if not .IsHome }}
 	{{/* 1. `{.Title} | {.Site.Title}` */}}
-	{{  $s.SetInMap "seo" "title" (printf "%s | %s" .Title .Site.Title )  }}
-{{  else  }}
+	{{  $s.SetInMap "seo" "title" (printf "%s | %s" $title site.Title)  }}
+{{ else }}
 	{{/* 2. `{.Site.Title}` */}}
-	{{  $s.SetInMap "seo" "title" .Site.Title  }}
-{{  end  }}
+	{{ $s.SetInMap "seo" "title" site.Title }}
+{{ end }}
 
 {{/* Site Name
 	---------------------------- */}}

@@ -17,7 +17,9 @@
 
 {{ $tags := slice }}
 {{ with $seo.title }}
-  {{ $tags = $tags | append (dict "name" "title" "inner" .) }}
+  {{ if not $config.disable_title_tag }}
+    {{ $tags = $tags | append (dict "name" "title" "inner" .) }}
+  {{ end }}
   {{ $tags = $tags | append (partial "tnd-seo/tag/all" (dict "key" "title" "value" .)) }}
 {{ end }}
 
