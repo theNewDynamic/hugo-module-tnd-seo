@@ -41,7 +41,6 @@
 {{  $s.SetInMap "seo" "updated_time" (.Lastmod.Format "2006-01-02T15:04:05-07:00")  }}
 {{  end  }}
 
- 
 {{/* Description
 	---------------------------- 
 	We use the following order of precedence
@@ -165,9 +164,18 @@
 
 
 
-{{/* Locale
+{{/* Locale and translations
 	---------------------------- */}}
-{{  $s.SetInMap "seo" "locale" "en_US"  }}
+{{  $s.SetInMap "seo" "locale" .Lang }}
+
+{{ $translations := slice }}
+{{ if .IsTranslated }}
+	{{ range .Translations }}
+			{{ $translations = $translations | append (dict "code" .Lang "permalink" .Permalink) }}
+	{{ end }}
+{{ $s.SetInMap "seo" "translations" $translations }}
+{{ end }}
+
 
 {{/* Canonical
 ---------------------------- */}}

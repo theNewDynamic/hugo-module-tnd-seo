@@ -37,10 +37,22 @@
   {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
 {{ end }}
 
-{{ with $seo.local }}
-{{ $c := dict "key" "local" "value" .}}
+{{ with $seo.locale }}
+  {{ $c := dict "key" "locale" "value" .}}
   {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
 {{ end }}
+
+{{ with $seo.translations }}
+  {{ range . }}
+  {{ $attr := dict "rel" "alternate" "href" .permalink "hreflang" .code }}
+  {{ $c := dict "name" "link" "attr" $attr }}
+  {{ $tags = $tags | append $c }}
+
+  {{ $c2 := dict "key" "locale:alternate" "value" .code}}
+  {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c2 $c2) }}
+  {{ end }}
+{{ end }}
+
 {{ with "website" }}
 {{ $c := dict "key" "type" "value" "website" }}
 {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
