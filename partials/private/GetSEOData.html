@@ -128,7 +128,9 @@
 	{{ end }}
 {{ end }}
 {{ with $img }}
-	{{  $s.SetInMap "seo" "image" (. | absURL) }}
+	{{ $s.SetInMap "seo" "image" (. | absURL) }}
+	{{ $s.SetInMap "seo" "image_absolute" (. | absURL) }}
+	{{ $s.SetInMap "seo" "image_relative" . }}
 {{ end }}
 
 {{/* Twitter
