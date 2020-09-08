@@ -36,7 +36,56 @@ Drop the following where appropriate
 ```
 
 The above partials, will look for content information and build an Data object to be printed in SEO tags (og, twitter card etc...).
-If you need to alternate the data model, you can do so by adding ot your project a `layouts/partials/tnd-seo/extend.html` partial and add to it as explained [here](/layouts/partials/tnd-seo/extend.html).
+
+### Add/Modify SEO Data
+
+The module parses some data for each page in order to produce the right SEO tags.
+If you need to alternate the data model, you can do so by adding ot your project a `layouts/partials/tnd-seo/AddSEOData.html` partial and add to it as explained [here](/layouts/partials/tnd-seo/eAddSEODataxtend.html).
+
+From the partial you can acces the SEO Data model with `.seo`.
+
+Here is the Data model before user modification:
+
+```
+canonical: String (ex: https://example.com/that-page)
+description: String
+image: String
+image_absolute: String (same as the above)
+image_relative: String
+jsonld: Map
+locale: String (ex: en)
+private: Boolean
+site_name: String
+title: String (ex: That Page | That Site)
+translations: Slice
+  - code: String
+    permalink: String
+twitter_card: summary_large_image
+type: website
+```
+
+### Example
+
+In this example we need to focus our efforts on the site recipes and
+1. Use a custom parameter for the SEO description
+2. Prepend a CDN url to the relative value of the SEO image
+
+```
+{{/* layouts/partials/AddSEOData.html */}}
+{{ $s := newScratch }}
+{{ $s.Set "seo" dict }}
+
+{{ if eq .Type "recipe" }}
+  {{ with .Params.recipe_incentive }}
+    {{ $s.SetInMap "seo" "description" . }}
+  {{ end }}
+  {{ with .seo.image_relative }}
+    {{ $s.SetInMap "seo" "image" (print "https://assets.recipeyaya.com/images" .) }}
+  {{ end }}
+{{ end }}
+
+{{/* Merge is important here as we want to overwrite the default data model with user's edits */}}
+{{ return merge .seo ($s.Get "seo") }}
 
 ### Settings
 
