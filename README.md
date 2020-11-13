@@ -86,6 +86,7 @@ In this example we need to focus our efforts on the site recipes and
 
 {{/* Merge is important here as we want to overwrite the default data model with user's edits */}}
 {{ return merge .seo ($s.Get "seo") }}
+```
 
 ### Settings
 
