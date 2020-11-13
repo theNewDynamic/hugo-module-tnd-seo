@@ -76,7 +76,7 @@ In this example we need to focus our efforts on the site recipes and
 {{ $s.Set "seo" dict }}
 
 {{ if eq .Type "recipe" }}
-  {{ with .Params.recipe_incentive }}
+  {{ with .Page.Params.recipe_incentive }}
     {{ $s.SetInMap "seo" "description" . }}
   {{ end }}
   {{ with .seo.image_relative }}

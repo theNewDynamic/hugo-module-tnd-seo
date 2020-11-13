@@ -85,11 +85,11 @@
 
 {{/* Site Name
 	---------------------------- */}}
-{{  with $.Param "seo.site_name"  }}
-	{{  $s.SetInMap "seo" "site_name" .  }}
-{{  else  }}
-	{{  $s.SetInMap "seo" "site_name" .Site.Title  }}
-{{  end  }}
+{{ with site.Params.tnd_seo.site_name }}
+	{{ $s.SetInMap "seo" "site_name" . }}
+{{ else }}
+	{{ $s.SetInMap "seo" "site_name" site.Title  }}
+{{ end }}
 
 {{/* Image
 	---------------------------- */}}
