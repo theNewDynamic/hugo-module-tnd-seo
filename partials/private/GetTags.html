@@ -104,7 +104,7 @@
   {{ if and $production (not $seo.private) }}
     {{ $value = "index, follow" }}
   {{ end }}
-  {{ $c := dict "name" "meta" "attr" (dict "content" $value) }}
+  {{ $c := dict "name" "meta" "attr" (dict "name" "robots" "content" $value) }}
   {{ $tags = $tags | append $c }}
 {{ end }}
 
