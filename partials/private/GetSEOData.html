@@ -155,7 +155,7 @@
 
 {{/* Type
 	---------------------------- */}}
-{{  $s.SetInMap "seo" "type" "website"  }}
+{{  $s.SetInMap "seo" "type" "website" }}
 
 {{  if in (slice "blog" "news") .Type  }}
 	{{  $s.SetInMap "seo" "type" "article"  }}
@@ -203,16 +203,13 @@
 		{{ $s.SetInMap "jsonld" "datePublished" .published_time }}
 		{{ $s.SetInMap "jsonld" "dateModified" .updated_time }}
 		{{ $s.SetInMap "jsonld" "description" .description }}
+		{{ with $seo.jsonld }}
+			{{ $s.Set "jsonld" (merge ($s.Get "jsonld") . ) }}
+		{{ end }}
 	{{ end }}
 	{{ with $s.Get "jsonld" }}
 		{{ $seo = merge $seo (dict "jsonld" .) }}
 	{{ end }}
-{{ end }}
-
-{{ with $.Params.seo.private }}
-	{{ $s.SetInMap "seo" "private" true }}
-{{ else }}
-	{{ $s.SetInMap "seo" "private" false }}
 {{ end }}
 
 {{ return $seo }}
