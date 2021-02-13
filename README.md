@@ -40,9 +40,9 @@ The above partials, will look for content information and build an Data object t
 ### Add/Modify SEO Data
 
 The module parses some data for each page in order to produce the right SEO tags.
-If you need to alternate the data model, you can do so by adding ot your project a `layouts/partials/tnd-seo/AddSEOData.html` partial and add to it as explained [here](/layouts/partials/tnd-seo/eAddSEODataxtend.html).
+If you need to alternate the data model, you can do so by adding to your project a `layouts/partials/tnd-seo/AddSEOData.html` partial and add to it as explained [here](/partials/AddSEOData.html).
 
-From the partial you can acces the SEO Data model with `.seo`.
+From the partial you can access the SEO Data model with `.seo`.
 
 Here is the Data model before user modification:
 
@@ -96,7 +96,7 @@ Settings are added to the project's parameter under the `tnd_seo` map as shown b
 # config.yaml
 params:
   tnd_seo:
-    # overides .Site.Title
+    # overrides .Site.Title
     site_name: MyWebsite 
     # Used for articles without images
     default_image: "/images/default.jpg"
@@ -148,4 +148,4 @@ In order to customize the SEO Data consumed by Hugo to build the tags. User can 
 
 ## theNewDynamic
 
-This project is maintained and love by [thenewDynamic](https://www.thenewdynamic.com).
+This project is maintained and loved by [thenewDynamic](https://www.thenewdynamic.com).
