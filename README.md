@@ -1,13 +1,13 @@
 # TND SEO Hugo Module
 
-Hugo Module to quickly add sensible -- yet highly extendable -- SEO/opengraph metatags.  
+Hugo Module to quickly add sensible -- yet highly extendable -- SEO/opengraph metatags.
 
 ## Requirements
 
 Requirements:
+
 - Go 1.14
 - Hugo 0.54.0
-
 
 ## Installation
 
@@ -23,12 +23,13 @@ Configure your project's module to import this module:
 # config.yaml
 module:
   imports:
-  - path: github.com/theNewDynamic/hugo-module-tnd-seo
+    - path: github.com/theNewDynamic/hugo-module-tnd-seo
 ```
 
 ## Usage
 
 Drop the following where appropriate
+
 ```
 {{ if templates.Exists "partials/tnd-seo/tags.html" }}
   {{ partial "tnd-seo/tags.html" . }}
@@ -67,6 +68,7 @@ type: website
 ### Example
 
 In this example we need to focus our efforts on the site recipes and
+
 1. Use a custom parameter for the SEO description
 2. Prepend a CDN url to the relative value of the SEO image
 
@@ -97,7 +99,7 @@ Settings are added to the project's parameter under the `tnd_seo` map as shown b
 params:
   tnd_seo:
     # overrides .Site.Title
-    site_name: MyWebsite 
+    site_name: MyWebsite
     # Used for articles without images
     default_image: "/images/default.jpg"
     # if true will use the SEO data object to output an json+ld script tag.
@@ -111,22 +113,41 @@ params:
 
 Maybe website or theme handle their own `<title>` tag and removing it can be tricky. Even though by default the Module will handle the tag for your, you can prevent such behaviour by adding `disable_title` to the settings.
 
-#### Private
-Any page can be set to private. For this feature to work, you need to set `enable_follow` to true.
+
+#### Private pages
+
+If the configuration value of `enable_follow` is set to `true`, the site's meta robots tags will be set for the site to be discoverable:
 
 ```
-title: Editors Only
+<meta content="index, follow" name=robots>
+```
+
+This setting can be overridden on a page-by-page-basis with the following front matter:
+
+```
 seo:
   private: true
 ```
 
-The page above, when in production will sport the nofollow/noindex meta tag. 
+The page above, when in production will sport the nofollow/noindex meta tag.
+
+```
+<meta content="noindex, nofollow" name=robots>
+```
+
+Alternatively, you can set all pages to be private using Hugo's [front matter cascade](https://gohugo.io/content-management/front-matter#front-matter-cascade):
+
+```
+cascade:
+  seo:
+    private: true
+```
 
 Note: If `enable_follow` is set to `true`, the module will print a `nofollow, noindex` tag for every pages unless
-- The environment variable `HUGO_ENV` value is `production`
-- AND 
-- `seo.private` is not set or equals to `false` 
 
+- The environment variable `HUGO_ENV` value is `production`  
+  AND
+- `seo.private` is not set or equals to `false`
 
 ### Front Matter
 
