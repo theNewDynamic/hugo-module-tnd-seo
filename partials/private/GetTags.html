@@ -77,7 +77,7 @@
 {{ end }}
 
 {{ with $seo.twitter_card }}
-{{ $c := dict "key" "twitter_card" "value" . }}
+{{ $c := dict "key" "card" "value" . }}
 {{ $tags = $tags | append (partialCached "tnd-seo/tag/twitter" $c $c) }}
 {{ end }}
 
@@ -93,7 +93,7 @@
 {{ end }}
 
 {{ with $seo.jsonld }}
-  {{ $c := dict "name" "script" "inner" (. | jsonify | safeJS) "attr" (dict "type" "application/ld+json") }}
+  {{ $c := dict "name" "script" "inner" (. | jsonify | safeJS ) "attr" (dict "type" "application/ld+json") }}
   {{ $tags = $tags | append $c }}
 {{ end }}
 
