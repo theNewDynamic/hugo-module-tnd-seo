@@ -55,7 +55,7 @@
 {{/* 2. Description
 	    As it could potentially contain HTML tags, we strip them with plainify */}}
 {{ else if .Params.description }}
-	{{ $description = .Params.description | plainify }}
+	{{ $description = .Params.description }}
 {{/* 3. Summary  */}}
 {{ else if .Summary }}
 	{{ $description = .Summary }}
@@ -64,7 +64,10 @@
 	{{ $description = site.Params.Description }}
 {{ end  }}
 
-{{ $s.SetInMap "seo" "description" $description }}
+{{/* We make sure text is sanitzed before storing as data (to avoid html or markdown) */}}
+{{ with partialCached "tnd-seo/private/SanitizeText" $description $description }}
+	{{ $s.SetInMap "seo" "description" . }}
+{{ end }}
  
 {{/* Title
   ---------------------------- 
