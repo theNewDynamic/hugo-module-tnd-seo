@@ -50,17 +50,17 @@
 	4. site description  */}}
 {{ $description := "" }}
 {{/* 1. SEO Description */}}
-{{ if .Params.seo.description  }}
+{{ if .Params.seo.description }}
 	{{ $description = .Params.seo.description }}
 {{/* 2. Description
 	    As it could potentially contain HTML tags, we strip them with plainify */}}
-{{ else if .Params.description }}
-	{{ $description = .Params.description }}
-{{/* 3. Summary  */}}
+{{ else if .Description }}
+	{{ $description = .Description }}
+{{/* 3. Summary */}}
 {{ else if .Summary }}
 	{{ $description = .Summary }}
 {{  else  }}
-{{/* 4. site description  */}}
+{{/* 4. site description */}}
 	{{ $description = site.Params.Description }}
 {{ end  }}
 
