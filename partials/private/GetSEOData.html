@@ -152,8 +152,12 @@
 	{{  $s.SetInMap "seo" "twitter_handle" (printf "@%s" .)  }}
 {{  end  }}
 
+{{/* We check if the page is not set as private */}}
 {{ with $.Params.seo.private }}
-{{  $s.SetInMap "seo" "private" true }}
+	{{ $s.SetInMap "seo" "private" true }}
+{{ end }}
+{{ with $.Params.private }}
+	{{ $s.SetInMap "seo" "private" true }}
 {{ end }}
 
 {{/* Type
