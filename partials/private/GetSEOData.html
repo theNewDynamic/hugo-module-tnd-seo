@@ -62,12 +62,15 @@
 {{  else  }}
 {{/* 4. site description */}}
 	{{ $description = site.Params.Description }}
-{{ end  }}
-
-{{/* We make sure text is sanitzed before storing as data (to avoid html or markdown) */}}
-{{ with partialCached "tnd-seo/private/SanitizeText" $description $description }}
-	{{ $s.SetInMap "seo" "description" . }}
 {{ end }}
+
+{{ with $description }}
+	{{/* We make sure text is sanitzed before storing as data (to avoid html or markdown) */}}
+	{{ with partialCached "tnd-seo/private/SanitizeText" $description $description }}
+		{{ $s.SetInMap "seo" "description" . }}
+	{{ end }}
+{{ end }}
+
  
 {{/* Title
   ---------------------------- 
