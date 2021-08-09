@@ -29,6 +29,8 @@
 {{ $s := newScratch }}
 {{ $s.Set "seo" dict  }}
 
+{{ $config := partialCached "tnd-seo/private/GetConfig" "GetConfig" }}
+
 {{/* Dates
 	----------------------------- */}}
 
@@ -91,7 +93,7 @@
 
 {{/* Site Name
 	---------------------------- */}}
-{{ with site.Params.tnd_seo.site_name }}
+{{ with $config.site_name }}
 	{{ $s.SetInMap "seo" "site_name" . }}
 {{ else }}
 	{{ $s.SetInMap "seo" "site_name" site.Title  }}
@@ -101,7 +103,7 @@
 	---------------------------- */}}
 {{ $img := false }}
 
-{{  with site.Params.tnd_seo.default_image  }}
+{{  with $config.default_image  }}
 	{{  $img = .  }}
 {{  end  }}
 
@@ -202,7 +204,7 @@
   {{ $seo = partial "tnd-seo/AddSEOData" (dict "seo" $seo "Page" $) }}
 {{ end }}
 
-{{ if site.Params.tnd_seo.jsonld }}
+{{ if $config.jsonld }}
 	{{ with $seo }}
 		{{ $s.SetInMap "jsonld" "@context"  "https://schema.org" }}
 		{{ $s.SetInMap "jsonld" "@type"  .type }}
