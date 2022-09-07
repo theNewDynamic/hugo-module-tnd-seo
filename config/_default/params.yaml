@@ -1,0 +1,29 @@
+seo:
+  titleTag: false # true to generate a title tag for each page
+  siteTitle: # site title override (only site params)
+  canonical: # page ref (site only)
+  enableFollowMeta: true # enable index,follow meta if private != true and production env
+  # page or site
+  image: # set default here, page override can be set.
+
+  # page only
+  # title: # page title override 
+  # private: true 
+
+
+# page params
+# params:
+#   description: #precedence over summary
+#   summary: 
+# .publishDate #precedence over .date
+# .date
+# .lasmode
+
+# .Site.Social.twitter (with no @)
+
+# .type blog, news > article
+# .type article > event 
+# use config???
+
+# translations > .lang
+

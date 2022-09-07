@@ -11,35 +11,35 @@
 	WRITING TAGS
   ------------------------------ */}}
   
-{{ $config := partialCached "tnd-seo/private/GetConfig" "tnd-seo/GetConfig" }}
+{{ $config := partialCached "hugo-seo/private/GetConfig" "GetConfig" }}
 
-{{ $seo := partial "tnd-seo/private/GetSEOData" $ }}
+{{ $seo := partial hugo-seo/private/GetSEOData" $ }}
 
 {{ $tags := slice }}
 {{ with $seo.title }}
-  {{ if not $config.disable_title_tag }}
+  {{ if (eq $.Param "seo.titleTag") }}
     {{ $tags = $tags | append (dict "name" "title" "inner" .) }}
   {{ end }}
-  {{ $tags = $tags | append (partial "tnd-seo/tag/all" (dict "key" "title" "value" .)) }}
+  {{ $tags = $tags | append (partial "hugo-seo/private/tag/all" (dict "key" "title" "value" .)) }}
 {{ end }}
 
 {{ with $seo.description }}
-  {{ $tags = $tags | append (partial "tnd-seo/tag/default" (dict "key" "description" "value" .)) }}
-  {{ $tags = $tags | append (partial "tnd-seo/tag/all" (dict "key" "description" "value" .)) }}
+  {{ $tags = $tags | append (partial "hugo-seo/private/tag/default" (dict "key" "description" "value" .)) }}
+  {{ $tags = $tags | append (partial "hugo-seo/private/tag/all" (dict "key" "description" "value" .)) }}
 {{ end }}
 
 {{ with $.Permalink }}
-{{ $tags = $tags | append (partial "tnd-seo/tag/all" (dict "key" "url" "value" .)) }}
+{{ $tags = $tags | append (partial "hugo-seo/private/tag/all" (dict "key" "url" "value" .)) }}
 {{ end }}
 
 {{ with $seo.site_name }}
   {{ $c := dict "key" "site_name" "value" . }}
-  {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
+  {{ $tags = $tags | append (partialCached "hugo-seo/private/tag/og" $c $c) }}
 {{ end }}
 
 {{ with $seo.locale }}
   {{ $c := dict "key" "locale" "value" .}}
-  {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
+  {{ $tags = $tags | append (partialCached "hugo-seo/private/tag/og" $c $c) }}
 {{ end }}
 
 {{ with $seo.translations }}
@@ -49,19 +49,19 @@
   {{ $tags = $tags | append $c }}
 
   {{ $c2 := dict "key" "locale:alternate" "value" .code}}
-  {{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c2 $c2) }}
+  {{ $tags = $tags | append (partialCached "hugo-seo/private/tag/og" $c2 $c2) }}
   {{ end }}
 {{ end }}
 
 {{ with "website" }}
 {{ $c := dict "key" "type" "value" "website" }}
-{{ $tags = $tags | append (partialCached "tnd-seo/tag/og" $c $c) }}
+{{ $tags = $tags | append (partialCached "hugo-seo/private/tag/og" $c $c) }}
 {{ end }}
 
 
 {{ range $key := slice "published_time" "updated_time" }}
   {{ with index $seo . }}
-  {{ $tags = $tags | append (partial "tnd-seo/tag/og" (dict "key" $key "value" .)) }}
+  {{ $tags = $tags | append (partial "hugo-seo/private/tag/og" (dict "key" $key "value" .)) }}
   {{ end }}
 {{ end }}
 
@@ -92,13 +92,13 @@
   {{ $tags = $tags | append (partialCached "tnd-seo/tag/twitter" $c2 $c2) }}
 {{ end }}
 
-{{ with $seo.jsonld }}
+{{ with .Param "seo.jsonld" }}
   {{ $c := dict "name" "script" "inner" (. | jsonify | safeJS ) "attr" (dict "type" "application/ld+json") }}
   {{ $tags = $tags | append $c }}
 {{ end }}
 
 {{/* Dealing with private setting */}}
-{{ with $config.enable_follow }}
+{{ with $config.enableFollowMeta }}
   {{ $value := "noindex, nofollow" }}
   {{ $production := eq (getenv "HUGO_ENV") "production" }}
   {{ if and $production (not $seo.private) }}

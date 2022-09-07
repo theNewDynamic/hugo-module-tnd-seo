@@ -1,4 +1,4 @@
-# TND SEO Hugo Module
+# Hugo SEO Module
 
 Hugo Module to quickly add sensible -- yet highly extendable -- SEO/opengraph metatags.
 
@@ -14,7 +14,7 @@ Requirements:
 If not already, [init](https://gohugo.io/hugo-modules/use-modules/#initialize-a-new-module) your project as Hugo Module:
 
 ```
-$: hugo mod init github.com/theNewDynamic/hugo-module-tnd-seo
+$: hugo mod init github.com/user/project_name
 ```
 
 Configure your project's module to import this module:
@@ -23,16 +23,16 @@ Configure your project's module to import this module:
 # config.yaml
 module:
   imports:
-    - path: github.com/theNewDynamic/hugo-module-tnd-seo
+    - path: github.com/future-wd/hugo-seo
 ```
 
 ## Usage
 
-Drop the following where appropriate
+Drop the following in your websites HEAD
 
 ```
-{{ if templates.Exists "partials/tnd-seo/tags.html" }}
-  {{ partial "tnd-seo/tags.html" . }}
+{{ if templates.Exists "partials/seo/tags.html" }}
+  {{ partial "seo/tags.html" . }}
 {{ end }}
 ```
 

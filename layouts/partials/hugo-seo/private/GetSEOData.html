@@ -29,7 +29,7 @@
 {{ $s := newScratch }}
 {{ $s.Set "seo" dict  }}
 
-{{ $config := partialCached "tnd-seo/private/GetConfig" "GetConfig" }}
+{{ $config := partialCached "hugo-seo/private/GetConfig" "GetConfig" }}
 
 {{/* Dates
 	----------------------------- */}}
@@ -91,43 +91,42 @@
 	{{ $s.SetInMap "seo" "title" site.Title }}
 {{ end }}
 
-{{/* Site Name
+{{/* Site Name 
 	---------------------------- */}}
-{{ with $config.site_name }}
-	{{ $s.SetInMap "seo" "site_name" . }}
+{{ with $config.siteTitle }}
+	{{ $s.SetInMap "seo" "siteTitle" . }}
 {{ else }}
-	{{ $s.SetInMap "seo" "site_name" site.Title  }}
+	{{ $s.SetInMap "seo" "siteTitle" site.Title  }}
 {{ end }}
 
 {{/* Image
 	---------------------------- */}}
 {{ $img := false }}
 
-{{  with $config.default_image  }}
-	{{  $img = .  }}
-{{  end  }}
-
 {{  with .Params.seo.image  }}
 	{{  $img = .  }}
 {{ else }}
 	{{/* If no SEO IMAGE is set, we look for the .Params.images slice
-		and use the first one if it has an `image` key */}}
-	{{  with .Params.images  }}
-		{{  with index . 0  }}
-			{{ if reflect.IsMap . }}
-				{{  with .image  }}
-					{{  $img = .  }}
-				{{  end  }}
-			{{ else }}
-				{{  $img = .  }}
-			{{ end }}
-		{{  end  }}
-	{{  end  }}
+		and use the first one  */}}
+  {{ with .Params.images  }}
+    {{ with index . 0  }}
+      {{ $img = .  }}
+    {{ end }}
+  {{  end  }}
 {{  end  }}
+
+{{/* if image isnt found via page seo.image or .images array, use site config */}}
+{{ if not $img }}
+  {{ with site.Params.seo.image }}
+    {{ $img = . }}
+  {{ end }}
+{{ end }}
+	
+
 
 {{/* Finally if after all of the conditional above we are not able to find an image for the page,
 	we resolve to looking for the following: */}}
-{{ if not true }}
+{{ if not $img }}
 	{{  $img_defaults := slice "/static/logo.jpg" "/static/logo.png" "/uploads/default.jpg"  }}
 	{{ range $path := $img_defaults }}
 		{{ if fileExists . }}
@@ -154,14 +153,14 @@
 
 {{/* We check the site config sports a Social.twitter and use as handle */}}
 {{  with .Site.Social.twitter  }}
-	{{  $s.SetInMap "seo" "twitter_handle" (printf "@%s" .)  }}
+	{{  $s.SetInMap "seo" "twitterHandle" (printf "@%s" .)  }}
 {{  end  }}
 
 {{/* We check if the page is not set as private */}}
-{{ with $.Params.seo.private }}
+{{ with .Params.seo.private }}
 	{{ $s.SetInMap "seo" "private" true }}
 {{ end }}
-{{ with $.Params.private }}
+{{ with .Params.private }}
 	{{ $s.SetInMap "seo" "private" true }}
 {{ end }}
 
