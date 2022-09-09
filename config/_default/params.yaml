@@ -13,9 +13,12 @@ seo:
     jsonld:
       article: true
       breadcrumbs: true
-
+  titleSeparator: "|"
   siteName: # site title override (for og/twitter)
   enableFollow: true # enable index,follow meta if private != true and production env
+
+  articleTypes: [post, posts, blog, news]
+  eventTypes: [article]
 
   # page or site
   image: # set default here, page override can be set.
@@ -33,7 +36,7 @@ seo:
 #   summary: 
 # .publishDate #precedence over .date
 # .date
-# .lasmode
+# .lasmod
 
 
 

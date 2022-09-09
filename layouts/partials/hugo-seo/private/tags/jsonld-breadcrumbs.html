@@ -22,10 +22,11 @@
   {{ $scratch := .scratch }}
   {{ with .parent }}
     {{ partial "inline/breadcrumb-recursive" (dict "scratch" $scratch "parent" .Parent) }}
+    {{ $title := .Params.seo.title | default .Title }}
     {{- $scratch.Add  "itemList" (slice (dict 
       "@type" "ListItem"
       "item" .Permalink 
-      "name" .Title
+      "name" $title
       "position" ($scratch.Get "itemCount")
     )) -}}
     {{ $scratch.Add "itemCount" 1 }}

@@ -1,0 +1,11 @@
+{{ with .meta }}
+{{ range $key, $value :=. }}
+{{ if eq $key "alternativeOutputFormats" }}
+{{ range $value }}
+{{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink site.Title | safeHTML }}
+{{ end }}
+{{ else }}
+{{ printf `<meta name="%s" content="%s">` $key $value | safeHTML }}
+{{ end }}
+{{ end }}
+{{ end }}

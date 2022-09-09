@@ -1,11 +1,7 @@
-{{ with .title -}}
-{{ printf "<title>%s</title>" .| safeHTML -}}
+{{ with .title }}
+{{ printf "<title>%s</title>" .| safeHTML }}
 {{ end }}
-{{- with .meta }}
-{{- range $key, $value :=. }}
-{{ printf `<meta name="%s" content="%s">` $key $value | safeHTML }}
-{{- end }}
-{{- end }}
+{{ partial "hugo-seo/private/print/meta.html" . }}
 {{- with .og }}
 {{- range $key, $value :=. }}
 {{ printf `<meta property="og:%s" content="%s">` $key $value | safeHTML }}

@@ -4,8 +4,11 @@
 
 {{ $s.SetInMap "og" "url" .canonical }}
 {{ $s.SetInMap "og" "title" .title }}
-{{ $s.SetInMap "og" "description" .description }}
 {{ $s.SetInMap "og" "locale" .locale }}
+
+{{ with .description }}
+  {{ $s.SetInMap "og" "description" . }}
+{{ end }}
 
 {{ with .image }}
   {{ $s.SetInMap "og" "image" . }}

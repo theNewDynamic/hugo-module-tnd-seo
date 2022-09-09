@@ -2,7 +2,7 @@
 {{ $s.Set "article" dict }}
 
 {{ $s.SetInMap "article" "@context"  "https://schema.org" }}
-{{ $s.SetInMap "article" "@type"  .type }}
+{{ $s.SetInMap "article" "@type"  "article" }}
 {{ $s.SetInMap "article" "url" .canonical }}
 {{ $s.SetInMap "article" "headline" .title }}
 {{ $s.SetInMap "article" "description" .description }}

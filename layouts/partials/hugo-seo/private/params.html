@@ -65,7 +65,7 @@
 	{{ $description = .Summary }}
 {{  else  }}
 {{/* 4. site description */}}
-	{{ $description = site.Params.Description }}
+	{{ $description = $config.Description }}
 {{ end }}
 
 {{ with $description }}
@@ -87,10 +87,9 @@
 	We use the following logic
 	1. Every pages: `{.Title} | {site.Title}`
 	2. Homepage: , only {site.Title} */}}
-
 {{ if not .IsHome }}
 	{{/* 1. `{.Title} | {.Site.Title}` */}}
-	{{  $s.SetInMap "params" "title_tag" (printf "%s | %s" $title site.Title)  }}
+	{{  $s.SetInMap "params" "title_tag" (printf "%s %s %s" $title $config.titleSeparator site.Title)  }}
 {{ else }}
 	{{/* 2. `{.Site.Title}` */}}
 	{{ $s.SetInMap "params" "title_tag" site.Title }}
@@ -122,7 +121,7 @@
 
 {{/* if image isnt found via page seo.image or .images array, use site config */}}
 {{ if not $img }}
-  {{ with site.Params.seo.image }}
+  {{ with $config.seo.image }}
     {{ $img = . }}
   {{ end }}
 {{ end }}
@@ -145,39 +144,24 @@
 	{{ $s.SetInMap "params" "image_relative" . }}
 {{ end }}
 
-{{/* Twitter card type
-	---------------------------- */}}
-{{ with $img }}
-	{{/* Most of the time we should have an image */}}
-	{{  $s.SetInMap "params" "twitter_card" "summary_large_image"  }}
-{{ else }}
-	{{/* For edge cases without: */}}
-	{{  $s.SetInMap "params" "twitter_card" "summary"  }}
-{{ end }}
 
 
-{{/* We check the site config sports a Social.twitter and use as handle */}}
-{{  with .Site.Social.twitter  }}
-	{{  $s.SetInMap "params" "twitter_site" (printf "@%s" .)  }}
-{{  end  }}
 
-{{/* We check the page params have author.twitter and use as handle */}}
-{{  with .Params.author.twitter  }}
-	{{  $s.SetInMap "params" "twitter_creator" (printf "@%s" .)  }}
-{{  end  }}
-
-{{/* We check if the page is not set as private */}}
-{{ with .Params.seo.private }}
+{{/* We check for the private param */}}
+{{ with .Param "seo.private" }}
 	{{ $s.SetInMap "params" "private" true }}
 {{ end }}
+
+
+
 
 {{/* Type
 	---------------------------- */}}
 {{  $s.SetInMap "params" "type" "website" }}
 
-{{  if in (slice "blog" "news" "post" "posts") .Type  }}
+{{  if in $config.articleTypes .Type  }}
 	{{  $s.SetInMap "params" "type" "article"  }}
-{{ else if in (slice "article") .Type }}
+{{ else if in $config.eventTypes .Type }}
 	{{  $s.SetInMap "params" "type" "event"  }}
 {{  end  }}
 
@@ -220,10 +204,32 @@
   {{ end }}
 {{ end }}
 
+{{/* meta only
+	---------------------------- */}}
+{{ with .AlternativeOutputFormats }}
+  {{ $s.SetInMap "params" "alternativeOutputFormats" . }}
+{{ end }}
 
 
+{{/* Twitter card params
+	---------------------------- */}}
+{{ with $img }}
+	{{/* Most of the time we should have an image */}}
+	{{  $s.SetInMap "params" "twitter_card" "summary_large_image"  }}
+{{ else }}
+	{{/* For edge cases without: */}}
+	{{  $s.SetInMap "params" "twitter_card" "summary"  }}
+{{ end }}
 
+{{/* We check the site config sports a Social.twitter and use as handle */}}
+{{  with .Site.Social.twitter  }}
+	{{  $s.SetInMap "params" "twitter_site" (printf "@%s" .)  }}
+{{  end  }}
 
+{{/* We check the page params have author.twitter and use as handle */}}
+{{  with .Params.author.twitter  }}
+	{{  $s.SetInMap "params" "twitter_creator" (printf "@%s" .)  }}
+{{  end  }}
 
 
 
@@ -277,6 +283,8 @@
 {{ end }}
 
 
+{{/* merge additions
+	----------------------------- */}}
 
 {{ $params := $s.Get "params" }}
 

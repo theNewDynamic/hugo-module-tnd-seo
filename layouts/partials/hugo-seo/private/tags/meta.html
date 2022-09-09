@@ -2,8 +2,12 @@
 
 {{ $s.Set "meta" dict  }}
 
-{{ $s.SetInMap "meta" "description" .description }}
+
 {{ $s.SetInMap "meta" "canonical" .canonical }}
+
+{{ with .description }}
+{{ $s.SetInMap "meta" "description" . }}
+{{ end }}
 
 {{ with .next }}
   {{ $s.SetInMap "meta" "next" . }}
@@ -11,6 +15,10 @@
 
 {{ with .prev }}
   {{ $s.SetInMap "meta" "prev" . }}
+{{ end }}
+
+{{ with .alternativeOutputFormats }}
+{{ $s.SetInMap "meta" "alternativeOutputFormats" . }}
 {{ end }}
 
 {{ return $s.Get "meta" }}
