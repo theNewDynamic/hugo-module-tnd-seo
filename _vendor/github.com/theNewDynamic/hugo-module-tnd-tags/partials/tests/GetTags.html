@@ -1,0 +1,37 @@
+{{/*
+  GetTags
+  For test purposes
+  @author @regisphilibert 
+
+  @context Type (.name)
+
+  @access private
+
+  @example - Go Template
+  {{ range partial "tnd-tags/tests/GetTags" . }}
+    {{ partialCached "tnd-tags/tag" . . }}
+  {{ end }}
+*/}}
+
+{{ $tags := slice }}
+
+{{ $title := "Vulputate Euismod" }}
+{{ $description := "Cras mattis consectetur purus sit amet fermentum. Donec sed odio dui. Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et." }}
+{{ with $title}}
+  {{ $tags = $tags | append (dict "name" "title" "inner" .) }}
+  {{ $tags = $tags | append (dict "name" "meta" "attr" (dict "property" "og:title" "content" .)) }}
+  {{ $tags = $tags | append (dict "name" "meta" "attr" (dict "name" "twitter:title" "content" .)) }}
+{{ end }}
+
+{{ with $description }}
+  {{ $tags = $tags | append (dict "name" "meta" "attr" (dict "name" "description" "content" .)) }}
+  {{ $tags = $tags | append (dict "name" "meta" "attr" (dict "property" "og:description" "content" .)) }}
+  {{ $tags = $tags | append (dict "name" "meta" "attr" (dict "name" "twitter:description" "content" .)) }}
+{{ end }}
+{{ $tags = $tags | append (dict "name" "script" "attr" (dict "type" "text/javascript" "src" "/js/main.2404627aa567766703cc.js" "defer" "")) }}
+{{ $tags = $tags | append (dict "name" "script" "inner" `
+  var text = 'Hello Tag!';
+  console.log(text);
+`) }} 
+
+{{ return $tags }}

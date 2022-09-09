@@ -1,14 +1,30 @@
+# (site.Title used by seo for title tag and others)
+# (site.Social.twitter (with no @))
+
+description: # used as fallback for seo 
+
 seo:
-  titleTag: false # true to generate a title tag for each page
-  siteTitle: # site title override (only site params)
-  canonical: # page ref (site only)
-  enableFollowMeta: true # enable index,follow meta if private != true and production env
+  # site only
+  generate:
+    title: true
+    meta: true
+    twitter: true
+    og: true
+    jsonld:
+      article: true
+      breadcrumbs: true
+
+  siteName: # site title override (for og/twitter)
+  enableFollow: true # enable index,follow meta if private != true and production env
+
   # page or site
   image: # set default here, page override can be set.
 
   # page only
-  # title: # page title override 
   # private: true 
+  # title: # page title override for title tag, og and twitter
+  # description: # override other descriptions for seo
+  # canonical: # add page ref to override .Permalink for canonical
 
 
 # page params
@@ -19,7 +35,7 @@ seo:
 # .date
 # .lasmode
 
-# .Site.Social.twitter (with no @)
+
 
 # .type blog, news > article
 # .type article > event 

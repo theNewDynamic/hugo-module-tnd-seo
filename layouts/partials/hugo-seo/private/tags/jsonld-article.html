@@ -1,0 +1,35 @@
+{{ $s := newScratch }}
+{{ $s.Set "article" dict }}
+
+{{ $s.SetInMap "article" "@context"  "https://schema.org" }}
+{{ $s.SetInMap "article" "@type"  .type }}
+{{ $s.SetInMap "article" "url" .canonical }}
+{{ $s.SetInMap "article" "headline" .title }}
+{{ $s.SetInMap "article" "description" .description }}
+
+{{ with .image }}
+{{ $s.SetInMap "article" "image" . }}
+{{ end }}
+
+{{ with .wordcount }}
+  {{ $s.SetInMap "article" "wordcount" . }}
+{{ end }}
+
+{{ with .published_time }}
+  {{ $s.SetInMap "article" "datePublished" . }}
+{{ end }}
+
+{{ with .modified_time }}
+  {{ $s.SetInMap "article" "dateModified" . }}
+{{ end }}
+
+{{ with .author_name }}
+  {{ $author := (dict
+    "@type" "Person"
+    "name" . 
+    "url" $.author_url )}}
+  {{ $authors := slice $author }}
+  {{ $s.SetInMap "author" $authors }}
+{{ end }}
+
+{{ return $s.Get "article" }}

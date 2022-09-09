@@ -10,7 +10,7 @@
 	@context Page 
 
 	@example - Go Template
-		{{ partial "tnd-seo/tags" . }}
+		{{ partial "hugo-seo/tags" . }}
 
   TODO:
     - [ ] Improve type test on "events", `article` seems very opinated.
@@ -25,22 +25,24 @@
 	BUILDING SCRATCH SEO OBJECT
 	------------------------------ */}}
 
+{{ $config := site.Params.seo }}
+
 {{/* Adding the seo map to scratch which will recieve SEO key/value pairs. */}}
 {{ $s := newScratch }}
-{{ $s.Set "seo" dict  }}
+{{ $s.Set "params" dict  }}
 
-{{ $config := partialCached "hugo-seo/private/GetConfig" "GetConfig" }}
+{{  $s.SetInMap "params" "page" .Page   }}
 
 {{/* Dates
 	----------------------------- */}}
 
 {{  if not .PublishDate.IsZero  }}
-{{  $s.SetInMap "seo" "published_time" (.PublishDate.Format "2006-01-02T15:04:05-07:00")  }}
+{{  $s.SetInMap "params" "published_time" (.PublishDate.Format "2006-01-02T15:04:05-07:00")  }}
 {{  else if not .Date.IsZero  }}
-{{  $s.SetInMap "seo" "published_time" (.Date.Format "2006-01-02T15:04:05-07:00")  }}
+{{  $s.SetInMap "params" "published_time" (.Date.Format "2006-01-02T15:04:05-07:00")  }}
 {{  end  }}
 {{  if not .Lastmod.IsZero  }}
-{{  $s.SetInMap "seo" "updated_time" (.Lastmod.Format "2006-01-02T15:04:05-07:00")  }}
+{{  $s.SetInMap "params" "modified_time" (.Lastmod.Format "2006-01-02T15:04:05-07:00")  }}
 {{  end  }}
 
 {{/* Description
@@ -68,35 +70,38 @@
 
 {{ with $description }}
 	{{/* We make sure text is sanitzed before storing as data (to avoid html or markdown) */}}
-	{{ with partialCached "tnd-seo/private/SanitizeText" $description $description }}
-		{{ $s.SetInMap "seo" "description" . }}
-	{{ end }}
+	{{ $s.SetInMap "params" "description" (. | markdownify | plainify) }}
 {{ end }}
 
- 
-{{/* Title
-  ---------------------------- 
-	We use the following logic
-	1. Every pages: `{.Title} | {site.Title}`
-	2. Homepage: , only {site.Title} */}}
+{{/* page title
+  ---------------------------- */}}
+
 {{ $title := .Title }}
 {{ with .Params.seo.title }}
 	{{ $title = . }}
 {{ end }}
+{{ $s.SetInMap "params" "title" $title }}
+ 
+{{/* Title Tag
+  ---------------------------- 
+	We use the following logic
+	1. Every pages: `{.Title} | {site.Title}`
+	2. Homepage: , only {site.Title} */}}
+
 {{ if not .IsHome }}
 	{{/* 1. `{.Title} | {.Site.Title}` */}}
-	{{  $s.SetInMap "seo" "title" (printf "%s | %s" $title site.Title)  }}
+	{{  $s.SetInMap "params" "title_tag" (printf "%s | %s" $title site.Title)  }}
 {{ else }}
 	{{/* 2. `{.Site.Title}` */}}
-	{{ $s.SetInMap "seo" "title" site.Title }}
+	{{ $s.SetInMap "params" "title_tag" site.Title }}
 {{ end }}
 
 {{/* Site Name 
 	---------------------------- */}}
-{{ with $config.siteTitle }}
-	{{ $s.SetInMap "seo" "siteTitle" . }}
+{{ with $config.siteName }}
+	{{ $s.SetInMap "params" "siteName" . }}
 {{ else }}
-	{{ $s.SetInMap "seo" "siteTitle" site.Title  }}
+	{{ $s.SetInMap "params" "siteName" site.Title  }}
 {{ end }}
 
 {{/* Image
@@ -135,43 +140,45 @@
 	{{ end }}
 {{ end }}
 {{ with $img }}
-	{{ $s.SetInMap "seo" "image" (. | absURL) }}
-	{{ $s.SetInMap "seo" "image_absolute" (. | absURL) }}
-	{{ $s.SetInMap "seo" "image_relative" . }}
+	{{ $s.SetInMap "params" "image" (. | absURL) }}
+	{{ $s.SetInMap "params" "image_absolute" (. | absURL) }}
+	{{ $s.SetInMap "params" "image_relative" . }}
 {{ end }}
 
-{{/* Twitter
+{{/* Twitter card type
 	---------------------------- */}}
 {{ with $img }}
 	{{/* Most of the time we should have an image */}}
-	{{  $s.SetInMap "seo" "twitter_card" "summary_large_image"  }}
+	{{  $s.SetInMap "params" "twitter_card" "summary_large_image"  }}
 {{ else }}
 	{{/* For edge cases without: */}}
-	{{  $s.SetInMap "seo" "twitter_card" "summary"  }}
+	{{  $s.SetInMap "params" "twitter_card" "summary"  }}
 {{ end }}
 
 
 {{/* We check the site config sports a Social.twitter and use as handle */}}
 {{  with .Site.Social.twitter  }}
-	{{  $s.SetInMap "seo" "twitterHandle" (printf "@%s" .)  }}
+	{{  $s.SetInMap "params" "twitter_site" (printf "@%s" .)  }}
+{{  end  }}
+
+{{/* We check the page params have author.twitter and use as handle */}}
+{{  with .Params.author.twitter  }}
+	{{  $s.SetInMap "params" "twitter_creator" (printf "@%s" .)  }}
 {{  end  }}
 
 {{/* We check if the page is not set as private */}}
 {{ with .Params.seo.private }}
-	{{ $s.SetInMap "seo" "private" true }}
-{{ end }}
-{{ with .Params.private }}
-	{{ $s.SetInMap "seo" "private" true }}
+	{{ $s.SetInMap "params" "private" true }}
 {{ end }}
 
 {{/* Type
 	---------------------------- */}}
-{{  $s.SetInMap "seo" "type" "website" }}
+{{  $s.SetInMap "params" "type" "website" }}
 
-{{  if in (slice "blog" "news") .Type  }}
-	{{  $s.SetInMap "seo" "type" "article"  }}
+{{  if in (slice "blog" "news" "post" "posts") .Type  }}
+	{{  $s.SetInMap "params" "type" "article"  }}
 {{ else if in (slice "article") .Type }}
-	{{  $s.SetInMap "seo" "type" "event"  }}
+	{{  $s.SetInMap "params" "type" "event"  }}
 {{  end  }}
 
 
@@ -179,48 +186,102 @@
 
 {{/* Locale and translations
 	---------------------------- */}}
-{{  $s.SetInMap "seo" "locale" .Lang }}
+{{  $s.SetInMap "params" "locale" .Lang }}
 
 {{ $translations := slice }}
 {{ if .IsTranslated }}
 	{{ range .Translations }}
 			{{ $translations = $translations | append (dict "code" .Lang "permalink" .Permalink) }}
 	{{ end }}
-{{ $s.SetInMap "seo" "translations" $translations }}
+{{ $s.SetInMap "params" "translations" $translations }}
 {{ end }}
 
 
 {{/* Canonical
 ---------------------------- */}}
-{{ with .Params.seo.canonical }}
-  {{  $s.SetInMap "seo" "canonical" (. | absURL)  }}
+{{/* .IsNode is for list pages */}}
+{{ if .IsNode }}
+  {{  $s.SetInMap "params" "canonical" (.Paginator.URL | absURL) }}
+  {{/* don't generate prev and next for home page (which is a node/list page) */}}
+  {{ if not .IsHome }}
+    {{ if .Paginator.HasPrev -}}
+      {{  $s.SetInMap "params" "prev" (.Paginator.Prev.URL | absURL) }}
+    {{ end }}
+    {{ if .Paginator.HasNext -}}
+      {{  $s.SetInMap "params" "next" (.Paginator.Next.URL | absURL) }}
+    {{ end }}
+  {{ end }}
 {{ else }}
-{{  $s.SetInMap "seo" "canonical" .Permalink  }}
+{{/* standard pages */}}
+  {{ with .Params.seo.canonical }}
+    {{  $s.SetInMap "params" "canonical" (. | absURL)  }}
+  {{ else }}
+    {{  $s.SetInMap "params" "canonical" .Permalink  }}
+  {{ end }}
 {{ end }}
 
-{{ $seo := $s.Get "seo" }}
-{{ if templates.Exists "partials/tnd-seo/AddSEOData.html" }}
-  {{ $seo = partial "tnd-seo/AddSEOData" (dict "seo" $seo "Page" $) }}
+
+
+
+
+
+
+
+
+{{/* open graph specific
+	----------------------------- */}}
+{{ with .Section }}
+  {{  $s.SetInMap "params" "section" .  }}
 {{ end }}
 
-{{ if $config.jsonld }}
-	{{ with $seo }}
-		{{ $s.SetInMap "jsonld" "@context"  "https://schema.org" }}
-		{{ $s.SetInMap "jsonld" "@type"  .type }}
-		{{ $s.SetInMap "jsonld" "headline" .title }}
-		{{ $s.SetInMap "jsonld" "image" .image }}
-		{{ $s.SetInMap "jsonld" "wordcount"  ($.WordCount | string) }}
-		{{ $s.SetInMap "jsonld" "url"  $.Permalink }}
-		{{ $s.SetInMap "jsonld" "datePublished" .published_time }}
-		{{ $s.SetInMap "jsonld" "dateModified" .updated_time }}
-		{{ $s.SetInMap "jsonld" "description" .description }}
-		{{ with $seo.jsonld }}
-			{{ $s.Set "jsonld" (merge ($s.Get "jsonld") . ) }}
-		{{ end }}
-	{{ end }}
-	{{ with $s.Get "jsonld" }}
-		{{ $seo = merge $seo (dict "jsonld" .) }}
-	{{ end }}
+{{- with .Params.audio }}
+  {{  $s.SetInMap "params" "audio" ( . | absURL)  }}
 {{ end }}
 
-{{ return $seo }}
+{{- with .Params.videos }}
+  {{- with index . 0 }}
+    {{  $s.SetInMap "params" "video" ( . | absURL)  }} />
+  {{ end }}
+{{ end }}
+
+{{- with .Params.video }}
+  {{  $s.SetInMap "params" "video" ( . | absURL)  }} />
+{{ end }}
+
+
+{{/* og:see_also
+  get from related content type... research
+  <meta property="og:see_also" content="{{ $page.Permalink }}" />
+
+*/}}
+
+
+{{/* jsonld specific
+	----------------------------- */}}
+
+{{- with .WordCount }}
+  {{  $s.SetInMap "params" "wordcount" .  }}
+{{ end }}
+
+
+{{  with .Params.author.name  }}
+  {{ $s.SetInMap "params" "author_name" . }}
+{{ end }}
+
+{{ with .Params.author.url }}
+  {{ $s.SetInMap "params" "author_url" . }}
+{{ end }}
+
+{{ with .Parent }}
+  {{ $s.SetInMap "params" "parent" . }} 
+{{ end }}
+
+
+
+{{ $params := $s.Get "params" }}
+
+{{ if templates.Exists "partials/hugo-seo/AddSEOData.html" }}
+  {{ $params = partial "hugo-seo/AddSEOData" (dict "seo" $params "Page" $) }}
+{{ end }}
+
+{{ return $params }}

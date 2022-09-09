@@ -1,0 +1,21 @@
+{{/*
+  tag
+  Public wrapper for WriteTags
+  
+
+  @author @regisphilibert
+
+  @context String
+
+  @use 
+    - private/WriteTag
+
+  @access public
+
+  @example - Go Template
+    {{ partial "path" context }}
+    {{ partialCached "path" context "variant" }}
+*/}}
+{{- with partialCached "tnd-tags/private/WriteTag" . . -}}
+{{- . | safeHTML -}}
+{{- end -}}

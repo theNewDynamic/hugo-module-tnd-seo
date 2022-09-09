@@ -1,0 +1,35 @@
+{{ $s := newScratch }}
+{{ $s.Set "og" dict  }}
+
+
+{{ $s.SetInMap "og" "url" .canonical }}
+{{ $s.SetInMap "og" "title" .title }}
+{{ $s.SetInMap "og" "description" .description }}
+{{ $s.SetInMap "og" "locale" .locale }}
+
+{{ with .image }}
+  {{ $s.SetInMap "og" "image" . }}
+{{ end }}
+
+{{ with .type }}
+  {{ $s.SetInMap "og" "type" . }}
+{{ end }}
+
+
+{{ with .section }}
+  {{ $s.SetInMap "og" "section" . }}
+{{ end }}
+
+{{ with .audio }}
+  {{ $s.SetInMap "og" "audio" . }}
+{{ end }}
+
+{{ with .video }}
+  {{ $s.SetInMap "og" "video" . }}
+{{ end }}
+
+{{ with .site_name }}
+  {{ $s.SetInMap "og" "site_name" . }}
+{{ end }}
+
+{{ return $s.Get "og" }}

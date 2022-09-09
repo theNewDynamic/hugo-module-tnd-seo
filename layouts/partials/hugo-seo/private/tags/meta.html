@@ -1,0 +1,16 @@
+{{ $s := newScratch }}
+
+{{ $s.Set "meta" dict  }}
+
+{{ $s.SetInMap "meta" "description" .description }}
+{{ $s.SetInMap "meta" "canonical" .canonical }}
+
+{{ with .next }}
+  {{ $s.SetInMap "meta" "next" . }}
+{{ end }}
+
+{{ with .prev }}
+  {{ $s.SetInMap "meta" "prev" . }}
+{{ end }}
+
+{{ return $s.Get "meta" }}

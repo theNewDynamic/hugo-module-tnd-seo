@@ -1,0 +1,30 @@
+{{ with .title -}}
+{{ printf "<title>%s</title>" .| safeHTML -}}
+{{ end }}
+{{- with .meta }}
+{{- range $key, $value :=. }}
+{{ printf `<meta name="%s" content="%s">` $key $value | safeHTML }}
+{{- end }}
+{{- end }}
+{{- with .og }}
+{{- range $key, $value :=. }}
+{{ printf `<meta property="og:%s" content="%s">` $key $value | safeHTML }}
+{{- end }}
+{{- end -}}
+{{- with .article }}
+{{- range $key, $value :=. }}
+{{ printf `<meta property="article:%s" content="%s">` $key $value | safeHTML }}
+{{- end }}
+{{- end -}}
+{{- with .twitter }}
+{{- range $key, $value :=. }}
+{{ printf `<meta name="twitter:%s" content="%s">` $key $value | safeHTML }}
+{{- end }}
+{{- end -}}
+{{- with .jsonld }}
+{{- range . }}
+<script type="application/ld+json">
+{{ . | jsonify (dict "indent" "  ") | safeJS }}
+</script>
+{{- end }}
+{{- end -}}

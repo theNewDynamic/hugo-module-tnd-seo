@@ -1,0 +1,21 @@
+{{ $s := newScratch }}
+{{ $s.Set "twitter" dict  }}
+
+{{ $s.SetInMap "twitter" "card" .twitter_card }}
+{{ $s.SetInMap "twitter" "description" .description }}
+{{ $s.SetInMap "twitter" "title" .title }}
+
+{{ with .twitter_site  }}
+  {{ $s.SetInMap "twitter" "site" .}}
+{{ end }}
+
+{{ with .twitter_creator }}
+  {{ $s.SetInMap "twitter" "creator" . }}
+{{ end }}
+
+{{ with .image }}
+  {{ $s.SetInMap "twitter" "image" . }}
+  {{ $s.SetInMap "twitter" "image:alt" $.title }}
+{{ end }}
+
+{{ return $s.Get "twitter" }}
