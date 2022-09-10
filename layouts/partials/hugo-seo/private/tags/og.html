@@ -18,7 +18,6 @@
   {{ $s.SetInMap "og" "type" . }}
 {{ end }}
 
-
 {{ with .section }}
   {{ $s.SetInMap "og" "section" . }}
 {{ end }}
@@ -33,6 +32,11 @@
 
 {{ with .site_name }}
   {{ $s.SetInMap "og" "site_name" . }}
+{{ end }}
+
+{{ $related := first 6 (site.RegularPages.Related .page) }}
+{{ with $related }}
+  {{ $s.SetInMap "og" "related" .Permalink }}
 {{ end }}
 
 {{ return $s.Get "og" }}

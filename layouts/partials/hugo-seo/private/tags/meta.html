@@ -18,7 +18,15 @@
 {{ end }}
 
 {{ with .alternativeOutputFormats }}
-{{ $s.SetInMap "meta" "alternativeOutputFormats" . }}
+  {{ $s.SetInMap "meta" "alternativeOutputFormats" . }}
+{{ end }}
+
+
+{{ $production := eq (getenv "HUGO_ENV") "production" }}
+{{ if (eq .private false) }}
+  {{ $s.SetInMap "meta" "robots" "index, follow" }}
+{{ else }}
+  {{ $s.SetInMap "meta" "robots" "noindex, nofollow" }}
 {{ end }}
 
 {{ return $s.Get "meta" }}

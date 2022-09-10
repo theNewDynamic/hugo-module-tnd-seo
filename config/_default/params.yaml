@@ -1,8 +1,6 @@
 # (site.Title used by seo for title tag and others)
 # (site.Social.twitter (with no @))
 
-description: # used as fallback for seo 
-
 seo:
   # site only
   generate:
@@ -15,16 +13,13 @@ seo:
       breadcrumbs: true
   titleSeparator: "|"
   siteName: # site title override (for og/twitter)
-  enableFollow: true # enable index,follow meta if private != true and production env
-
   articleTypes: [post, posts, blog, news]
   eventTypes: [article]
-
   # page or site
-  image: # set default here, page override can be set.
-
+  image: # set default here, page override can be set. 
+  private: false # set here or per page to modify robots meta, remove sitemap, robots and rss listing for page(s)
+    
   # page only
-  # private: true 
   # title: # page title override for title tag, og and twitter
   # description: # override other descriptions for seo
   # canonical: # add page ref to override .Permalink for canonical
@@ -38,11 +33,4 @@ seo:
 # .date
 # .lasmod
 
-
-
-# .type blog, news > article
-# .type article > event 
-# use config???
-
-# translations > .lang
 

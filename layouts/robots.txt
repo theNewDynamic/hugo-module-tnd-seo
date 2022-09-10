@@ -1,9 +1,14 @@
 User-agent: *
-{{- $pages := .Data.Pages -}}
-
-{{- $pages = where $pages "Params.seo.private" true -}}
-
-{{- range $pages }}
+{{- if eq site.Params.seo.private true }}
+Disallow: *
+{{- else }}
+  {{- $private := where .Data.Pages "Params.seo.private" true -}}
+  {{ if eq (len $private) 0 }}
+Allow: * 
+  {{ else }}
+    {{- range $private }}
 Disallow: {{ .RelPermalink }}
-{{- end }}
+    {{- end }}
+  {{- end -}}
+{{- end -}}
 

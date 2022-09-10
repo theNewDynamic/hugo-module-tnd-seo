@@ -1,8 +1,9 @@
+{{- if ne site.Params.seo.private true -}}
 {{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   {{ $pages := .Data.Pages }}
-  {{ $pages = where $pages "Params.seo.private" "!=" true }}
+  {{- $pages = where $pages "Params.seo.private" "!=" "true" -}}
   {{ range $pages }}
     {{- if .Permalink -}}
   <url>
@@ -24,3 +25,4 @@
     {{- end -}}
   {{ end }}
 </urlset>
+{{- end -}}

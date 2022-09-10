@@ -46,26 +46,31 @@
 {{  end  }}
 
 {{/* Description
-	---------------------------- 
+	----------------------------------------
 	We use the following order of precedence
 	1. SEO Description, then, if not found,
-	2. Description, then if not found,
-	3. Summary then, if not found,
-	4. site description  */}}
+	2. Page Description, then if not found,
+	3. Page Summary then, if not found,
+	4. Site params SEO Description  
+  5. Site params description 
+  As it could potentially contain HTML tags, 
+  we strip them with plainify                   */}}
 {{ $description := "" }}
 {{/* 1. SEO Description */}}
 {{ if .Params.seo.description }}
 	{{ $description = .Params.seo.description }}
-{{/* 2. Description
-	    As it could potentially contain HTML tags, we strip them with plainify */}}
+{{/* 2. Description */}}
 {{ else if .Description }}
 	{{ $description = .Description }}
 {{/* 3. Summary */}}
 {{ else if .Summary }}
 	{{ $description = .Summary }}
+{{/* 4. site params seo description */}}
+{{ else if $config.Description }}
+  {{ $description = site.Description }}
+{{/* 5. Site params description */}}
 {{  else  }}
-{{/* 4. site description */}}
-	{{ $description = $config.Description }}
+{{ $description = site.Params.description }}
 {{ end }}
 
 {{ with $description }}
@@ -74,24 +79,37 @@
 {{ end }}
 
 {{/* page title
-  ---------------------------- */}}
-
+  ----------------------------
+1. Page seo title 
+2. Page title  */}}
 {{ $title := .Title }}
 {{ with .Params.seo.title }}
 	{{ $title = . }}
 {{ end }}
 {{ $s.SetInMap "params" "title" $title }}
+
+{{/* Site title
+  ----------------------------
+1. Site title 
+2. Poorly config'd site title  */}}
+{{ $siteTitle := false }}
+{{ with site.Title }}
+  {{ $siteTitle = . }}
+{{ else }}
+  {{ $siteTitle = site.Params.Title }}
+{{ end }}
  
 {{/* Title Tag
   ---------------------------- 
 	We use the following logic
-	1. Every pages: `{.Title} | {site.Title}`
-	2. Homepage: , only {site.Title} */}}
+	1. Every pages: `{$title} | {$siteTitle}`
+	2. Homepage: , only {$siteTitle}
+  "|" title seperator is configured @ site.Params.seo.titleSeparator */}}
 {{ if not .IsHome }}
-	{{/* 1. `{.Title} | {.Site.Title}` */}}
+	{{/* 1. All except home page */}}
 	{{  $s.SetInMap "params" "title_tag" (printf "%s %s %s" $title $config.titleSeparator site.Title)  }}
 {{ else }}
-	{{/* 2. `{.Site.Title}` */}}
+	{{/* 2. Home page */}}
 	{{ $s.SetInMap "params" "title_tag" site.Title }}
 {{ end }}
 
@@ -149,7 +167,7 @@
 
 {{/* We check for the private param */}}
 {{ with .Param "seo.private" }}
-	{{ $s.SetInMap "params" "private" true }}
+	{{ $s.SetInMap "params" "private" . }}
 {{ end }}
 
 

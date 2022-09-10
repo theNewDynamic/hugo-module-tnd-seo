@@ -1,4 +1,2 @@
 hugoVersion:
   min: "0.61.0"
-imports:
-- path: github.com/theNewDynamic/hugo-module-tnd-tags

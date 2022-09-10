@@ -1,0 +1,16 @@
+{{- with .og }}
+{{- range $key, $value :=. }}
+  {{- if eq $key "related" }}
+    {{- range $value }}
+{{ printf `<meta property="og:related" content="%s">` . | safeHTML }}
+    {{- end }}
+  {{- else }}
+{{ printf `<meta property="og:%s" content="%s">` $key $value | safeHTML }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- with .article }}
+  {{- range $key, $value :=. }}
+{{ printf `<meta property="article:%s" content="%s">` $key $value | safeHTML }}
+  {{- end }}
+{{- end -}}
