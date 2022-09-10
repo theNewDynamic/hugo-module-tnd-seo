@@ -1,6 +1,7 @@
 baseURL: https://hugo-seo.netlify.app/
 languageCode: en
 title: Hugo Seo Module Test Site
+description: Default site description for pages with no text
 
 # limit pagination to 2 for testing prev and next tags
 paginate: 2
