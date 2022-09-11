@@ -1,0 +1,18 @@
+enableRobotsTXT: true
+description: # used as fall back if not page description/summary is found
+title: # set the site title here, seo.title page/site config is an override
+
+# adds newer content older page's related content
+related:
+  includeNewer: true
+  indices:
+  - name: keywords
+    weight: 100
+  - name: date
+    weight: 10
+  - name: type
+    weight: 90
+  - tags:
+    weight: 80
+  threshold: 80
+  toLower: false

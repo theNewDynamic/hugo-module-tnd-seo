@@ -1,0 +1,51 @@
+{{ $s := newScratch }}
+{{ $s.Set "og" dict  }}
+
+
+{{ $s.SetInMap "og" "url" .canonical }}
+{{ $s.SetInMap "og" "title" .title }}
+{{ $s.SetInMap "og" "locale" .locale }}
+
+{{ with .description }}
+  {{ $s.SetInMap "og" "description" . }}
+{{ end }}
+
+{{ with .image }}
+  {{ $s.SetInMap "og" "image" . }}
+  {{/* add image height/width so fb image displays on first share */}}
+  {{ with $.image_width }}
+    {{ $s.SetInMap "og" "image:width" . }}
+  {{ end }}
+  {{ with $.image_height }}
+    {{ $s.SetInMap "og" "image:height" . }}
+  {{ end }}
+{{ end }}
+
+
+
+{{ with .type }}
+  {{ $s.SetInMap "og" "type" . }}
+{{ end }}
+
+{{ with .section }}
+  {{ $s.SetInMap "og" "section" . }}
+{{ end }}
+
+{{ with .audio }}
+  {{ $s.SetInMap "og" "audio" . }}
+{{ end }}
+
+{{ with .video }}
+  {{ $s.SetInMap "og" "video" . }}
+{{ end }}
+
+{{ with .site_name }}
+  {{ $s.SetInMap "og" "site_name" . }}
+{{ end }}
+
+{{ $related := first 6 (site.RegularPages.Related .page) }}
+{{ with $related }}
+  {{ $s.SetInMap "og" "related" .Permalink }}
+{{ end }}
+
+{{ return $s.Get "og" }}

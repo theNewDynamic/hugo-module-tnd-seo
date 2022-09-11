@@ -1,7 +1,6 @@
-{{- with . -}}
-{{- with partial "tnd-seo/private/GetTags" . -}}
-{{- range . }}
-{{ partialCached "tnd-tags/tag" . . }}
-{{- end -}}
-{{- end -}}
-{{- end -}}
+{{- /* get params from context */ -}}
+{{- $params := partial "hugo-seo/private/params.html" . -}}
+{{- /* generate tag data based on params and config */ -}}
+{{- $tags := partial "hugo-seo/private/tags/index.html" $params -}}
+{{- /* print tags */ -}}
+{{- partial "hugo-seo/private/print/index.html" $tags -}}

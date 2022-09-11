@@ -1,0 +1,46 @@
+{{ $s := newScratch }}
+{{ $s.Set "tags" dict }}
+
+{{ if eq site.Params.seo.generate.title true }}
+  {{ $s.SetInMap "tags" "title" .title_tag }}
+{{ end }}
+
+{{ if eq (.page.Param "seo.generate.twitter") true }}
+  {{ $twitter := partial "hugo-seo/private/tags/twitter" . }}
+  {{ $s.SetInMap "tags" "twitter" $twitter }}
+{{ end }}
+
+{{ if eq (.page.Param "seo.generate.og") true }}
+  {{ $og := partial "hugo-seo/private/tags/og" . }}
+  {{ $s.SetInMap "tags" "og" $og }}
+  {{ if and (eq .type "article") (not .IsNode) }}
+    {{ $article := partial "hugo-seo/private/tags/og-article" . }}
+    {{ $s.SetInMap "tags" "article" $article }}
+  {{ end }}
+{{ end }}
+
+{{ if eq (.page.Param "seo.generate.meta") true }}
+  {{ $meta := partial "hugo-seo/private/tags/meta" . }}
+  {{ $s.SetInMap "tags" "meta" $meta }}
+{{ end }}
+
+{{ $jsonld := slice}}
+
+{{/* only display article for .type article and not list pages, if enabled */}}
+{{ if and 
+  (eq (.page.Param "seo.generate.jsonld.article") true)
+  (and 
+    (eq .type "article")
+    (not .page.IsNode)) }}
+  {{ $jsonld_article := partial "hugo-seo/private/tags/jsonld-article" . }}
+  {{ $jsonld = $jsonld | append $jsonld_article }}
+{{ end }}
+
+{{ if eq (.page.Param "seo.generate.jsonld.breadcrumbs") true }}
+  {{ $jsonld_breadcrumbs := partial "hugo-seo/private/tags/jsonld-breadcrumbs" . }}
+  {{ $jsonld = $jsonld | append $jsonld_breadcrumbs }}
+{{ end }}
+
+{{ $s.SetInMap "tags" "jsonld" $jsonld }}
+
+{{ return $s.Get "tags" }}
