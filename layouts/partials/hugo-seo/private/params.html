@@ -124,15 +124,26 @@
 {{/* Image
 	---------------------------- */}}
 {{ $img := false }}
+{{ $imgRes := false }}
 
 {{  with .Params.seo.image  }}
-	{{  $img = .  }}
+  {{ with $.Resources.GetMatch . }}
+	  {{  $img = .RelPermalink  }}
+    {{ $imgRes = . }}
+  {{ else }}
+    {{  $img = .  }}
+  {{ end }}
 {{ else }}
 	{{/* If no SEO IMAGE is set, we look for the .Params.images slice
 		and use the first one  */}}
   {{ with .Params.images  }}
     {{ with index . 0  }}
-      {{ $img = .  }}
+      {{ with $.Resources.GetMatch "test.jpg" }}
+        {{ $imgRes = . }}
+        {{  $img = .RelPermalink  }}
+      {{ else }}
+        {{  $img = .  }}
+      {{ end }}
     {{ end }}
   {{  end  }}
 {{  end  }}
@@ -140,7 +151,12 @@
 {{/* if image isnt found via page seo.image or .images array, use site config */}}
 {{ if not $img }}
   {{ with $config.seo.image }}
-    {{ $img = . }}
+    {{ with resources.GetMatch . }}
+      {{ $imgRes = . }}
+      {{  $img = .RelPermalink  }}
+    {{ else }}
+      {{  $img = .  }}
+    {{ end }}
   {{ end }}
 {{ end }}
 	
@@ -156,10 +172,17 @@
 		{{ end }}
 	{{ end }}
 {{ end }}
+
 {{ with $img }}
-	{{ $s.SetInMap "params" "image" (. | absURL) }}
-	{{ $s.SetInMap "params" "image_absolute" (. | absURL) }}
-	{{ $s.SetInMap "params" "image_relative" . }}
+	{{ $s.SetInMap "params" "image" ( . | absURL) }}
+  {{ with $imgRes.Height }}
+    {{ $s.SetInMap "params" "image_height" ( . | string) }}
+    {{ $s.SetInMap "params" "image_width" ( $imgRes.Width | string) }}
+  {{ else }}
+    {{ $data := imageConfig $img }} 
+    {{ $s.SetInMap "params" "image_height" ($data.Height | string) }}
+    {{ $s.SetInMap "params" "image_width"  ($data.Height | string) }}
+  {{ end }}
 {{ end }}
 
 

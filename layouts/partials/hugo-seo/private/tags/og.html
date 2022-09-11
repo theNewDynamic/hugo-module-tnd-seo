@@ -12,7 +12,16 @@
 
 {{ with .image }}
   {{ $s.SetInMap "og" "image" . }}
+  {{/* add image height/width so fb image displays on first share */}}
+  {{ with $.image_width }}
+    {{ $s.SetInMap "og" "image:width" . }}
+  {{ end }}
+  {{ with $.image_height }}
+    {{ $s.SetInMap "og" "image:height" . }}
+  {{ end }}
 {{ end }}
+
+
 
 {{ with .type }}
   {{ $s.SetInMap "og" "type" . }}
