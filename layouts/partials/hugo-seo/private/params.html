@@ -188,7 +188,9 @@
 
 
 
-{{/* We check for the private param */}}
+{{/* We check for the private param 
+  site.Params.seo.private: true will make
+  the following return true also */}}
 {{ with .Param "seo.private" }}
 	{{ $s.SetInMap "params" "private" . }}
 {{ end }}
