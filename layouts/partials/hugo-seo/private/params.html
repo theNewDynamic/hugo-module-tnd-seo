@@ -314,7 +314,7 @@
 	{{  $s.SetInMap "params" "jsonldType" "Article"  }}
 {{ else if (in $config.jsonldNewsArticleTypes .Section)  }}
 	{{  $s.SetInMap "params" "jsonldType" "NewsArticle"  }}
-{{ else if (in $config.jsonBlogPostingTypes .Section)  }}
+{{ else if (in $config.jsonldBlogPostingTypes .Section)  }}
 	{{  $s.SetInMap "params" "jsonldType" "BlogPosting"  }}
 {{ end }}
 

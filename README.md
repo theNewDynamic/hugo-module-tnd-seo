@@ -73,7 +73,9 @@ params:
     titleSeparator: "|" # the character used in between the two strings for the title if not home page.
     siteName: # site title override (for og/twitter)
     ogArticleTypes: [post, posts, blog, news, article, articles, event, events]
-    jsonldArticleTypes: [post, posts, blog, news, article, articles, event, events]
+    jsonldArticleTypes: [article, articles, event, events]
+    jsonldNewsArticleTypes: [news]
+    jsonldBlogPostingTypes: [post, posts, blog]
     image: # set default here, page override can be set. 
     private: false # makes the whole site private, see below.
 ```
@@ -112,9 +114,9 @@ You can set a site title overide for use in the open graph tag.
 
 The types in the array will be recognised as articles for opengraph tag generation.
 
-### params.seo.jsonldArticleTypes
+### params.seo.jsonld*
 
-The types in the array will have a json-ld article script generated.
+JSON-LD article has three different types, according to these arrays.
 
 ### params.seo.image
 
