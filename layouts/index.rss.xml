@@ -1,4 +1,11 @@
-{{- if ne site.Params.seo.private true -}}
+{{- $public := 0 -}}
+{{- range .Data.Pages -}}
+  {{- if eq (.Param "seo.private") false -}}
+    {{- $public = add $public 1 -}}
+  {{- end -}}
+{{- end -}}
+{{- /* dont output anything if there are no public pages  */ -}}
+{{- if ne $public 0 -}}
 {{- $pctx := . -}}
 {{- if .IsHome -}}{{ $pctx = .Site }}{{- end -}}
 {{- $pages := slice -}}
@@ -23,12 +30,11 @@
     <webMaster>{{.}}{{ with $.Site.Author.name }} ({{.}}){{end}}</webMaster>{{end}}{{ with .Site.Copyright }}
     <copyright>{{.}}</copyright>{{end}}{{ if not .Date.IsZero }}
     <lastBuildDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>{{ end }}
-    {{- with .OutputFormats.Get "RSS" -}}
+    {{- with .OutputFormats.Get "RSS" }}
     {{ printf "<atom:link href=%q rel=\"self\" type=%q />" .Permalink .MediaType | safeHTML }}
-    {{- end -}}
-   
-    {{- $pages = where $pages "Params.seo.private" "!=" "true" -}}
+    {{- end }}
     {{ range $pages }}
+    {{- if eq (.Param "seo.private") false -}}
     <item>
       <title>{{ .Title }}</title>
       <link>{{ .Permalink }}</link>
@@ -37,6 +43,7 @@
       <guid>{{ .Permalink }}</guid>
       <description>{{ .Summary | html }}</description>
     </item>
+    {{- end }}
     {{ end }}
   </channel>
 </rss>

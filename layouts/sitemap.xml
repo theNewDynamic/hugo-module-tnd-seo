@@ -1,10 +1,15 @@
-{{- if ne site.Params.seo.private true -}}
+{{- $public := slice -}}
+{{- range .Data.Pages -}}
+  {{- if eq (.Param "seo.private") false -}}
+    {{- $public = $public | append . -}}
+  {{- end -}}
+{{- end -}}
+{{- /* dont output anything if there are no public pages */ -}}
+{{- if ne (len $public) 0 -}}
 {{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  {{ $pages := .Data.Pages }}
-  {{- $pages = where $pages "Params.seo.private" "!=" "true" -}}
-  {{ range $pages }}
+  {{ range $public }}
     {{- if .Permalink -}}
   <url>
     <loc>{{ .Permalink }}</loc>{{ if not .Lastmod.IsZero }}
