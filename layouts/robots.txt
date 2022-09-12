@@ -15,9 +15,13 @@ Disallow: *
 Disallow: {{ .RelPermalink }}
 {{ end }}
 {{ end }}
+{{- if ne (len $private) (len .Data.Pages) }}
 {{- with site.BaseURL }}
 Sitemap: {{ . }}sitemap.xml
 {{- end }}
+{{- end -}}
+
+
 
 
 
