@@ -22,7 +22,7 @@ Requirements:
 
 If not already, [init](https://gohugo.io/hugo-modules/use-modules/#initialize-a-new-module) your project as Hugo Module:
 
-```
+```terminal
 $: hugo mod init github.com/user/project_name
 ```
 
@@ -39,7 +39,7 @@ module:
 
 Drop the following in your websites HEAD
 
-```
+```go-html-template
 {{ partial "hugo-seo/tags.html" . }}
 ```
 
@@ -86,7 +86,6 @@ Set the sites title in the site config.
 
 This has already been set to true in the modules config. DO NOT have `enableRobotsTXT: false` in your site config, because it will override the SEO module.
 
-
 ### params.description
 
 Set a default description that will be used if the page does not have a description or summary.
@@ -99,9 +98,9 @@ The module generates a title tag. If you can't disable your theme's title, chang
 
 ### params.seo.titleSeparator
 
-The home page has <title>{ site title}</title>
+The home page has `<title>{ site title}</title>`
 
-Other pages have <title>{page title} | { site title } </title>
+Other pages have `<title>{page title} | { site title } </title>`
 
 You can change the separator from "|" to another character e.g. "-"
 
@@ -132,7 +131,7 @@ If site config has private: true set, the following will take place:
 
 You can set seo.private: true at a site level to make every page public.
 
-This can be overriden at a page level e.g.
+This can be overridden at a page level e.g.
 
 site:  params.seo.private: false
 
@@ -157,7 +156,7 @@ Will result in the following output:
 
 The module uses title, description, summary and type from frontmatter.
 
-Additionally there is a `seo` map for overrides specific to the module. 
+Additionally there is a `seo` map for overrides specific to the module.
 
 Add any of the configurations to override your site configuration.
 

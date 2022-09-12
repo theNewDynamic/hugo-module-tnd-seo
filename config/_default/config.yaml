@@ -4,9 +4,9 @@ title: # set the site title here, seo.title page/site config is an override
 
 # adds newer content older page's related content
 related:
-  includeNewer: true
-  threshold: 0
-  toLower: true
+  includeNewer: true # add pages that are newer than the current one
+  threshold: 0 # anything is ok
+  toLower: true # lowercase params before comparing
   indices:
   - name: keywords
     weight: 100

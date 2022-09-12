@@ -2,10 +2,11 @@
 {{ $s.Set "article" dict }}
 
 {{ $s.SetInMap "article" "@context"  "https://schema.org" }}
-{{ $s.SetInMap "article" "@type"  "article" }}
+{{ $s.SetInMap "article" "@type"  .jsonldType }}
 {{ $s.SetInMap "article" "url" .canonical }}
 {{ $s.SetInMap "article" "headline" .title }}
 {{ $s.SetInMap "article" "description" .description }}
+{{ $s.SetInMap "article" "articleBody" .articleBody }}
 
 {{ with .image }}
 {{ $s.SetInMap "article" "image" . }}
@@ -23,13 +24,16 @@
   {{ $s.SetInMap "article" "dateModified" . }}
 {{ end }}
 
-{{ with .author_name }}
-  {{ $author := (dict
-    "@type" "Person"
-    "name" . 
-    "url" $.author_url )}}
-  {{ $authors := slice $author }}
-  {{ $s.SetInMap "author" $authors }}
+{{ with .authors }}
+  {{ $authors := slice }}
+  {{ range . }}
+    {{ $author := (dict "@type" "person") }}
+    {{ range $key, $value := . }}
+      {{ $author = merge $author (dict $key $value) }}
+    {{ end }}
+    {{ $authors = $authors | append $author }}
+  {{ end }}
+  {{ $s.SetInMap "article" "authors" $authors }}
 {{ end }}
 
-{{ return $s.Get "article" }}
+{{ return $s.Get "article"  }}
