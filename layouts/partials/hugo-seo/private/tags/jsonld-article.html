@@ -1,6 +1,7 @@
 {{ $s := newScratch }}
 {{ $s.Set "article" dict }}
 
+
 {{ $s.SetInMap "article" "@context"  "https://schema.org" }}
 {{ $s.SetInMap "article" "@type"  .jsonldType }}
 {{ $s.SetInMap "article" "url" .canonical }}
@@ -27,7 +28,7 @@
 {{ with .authors }}
   {{ $authors := slice }}
   {{ range . }}
-    {{ $author := (dict "@type" "person") }}
+    {{ $author := (dict "@type" "Person") }}
     {{ range $key, $value := . }}
       {{ $author = merge $author (dict $key $value) }}
     {{ end }}
@@ -35,5 +36,6 @@
   {{ end }}
   {{ $s.SetInMap "article" "authors" $authors }}
 {{ end }}
+
 
 {{ return $s.Get "article"  }}

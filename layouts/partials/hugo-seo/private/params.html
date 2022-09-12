@@ -1,25 +1,16 @@
 {{/* 
-	Structure SEO Data for a given page
-	+ print tags
-	+ print jsonld
+	Creates SEO params based on page params, and site config
 	
-	@author The New Dynamic
+	@author @sean-au
 	
-	@access public
+	@access private
 
 	@context Page 
 
 	@example - Go Template
-		{{ partial "hugo-seo/tags" . }}
+		{{ partial "hugo-seo/private/params" . }}
 
-  TODO:
-    - [ ] Improve type test on "events", `article` seems very opinated.
-		- [ ] Find a reasonable default image when `site.Params.default_image` is not set.
-		- [ ] Twitter can sport "author" handle on top of the site's. Devise a test for author? 
-		- [ ] Maybe consider another approach to set the twitter_card (summary, etc...)
-		- [ ] Not sure about image size. Following https://docs.imgix.com/best-practices/improving-seo-traffic, we have a 
-			square of 800x800 */}}
-
+    */}}
  
 {{/*------------------------------
 	BUILDING SCRATCH SEO OBJECT
@@ -344,14 +335,4 @@
   {{ $s.SetInMap "params" "parent" . }} 
 {{ end }}
 
-
-{{/* merge additions
-	----------------------------- */}}
-
-{{ $params := $s.Get "params" }}
-
-{{ if templates.Exists "partials/hugo-seo/AddSEOData.html" }}
-  {{ $params = partial "hugo-seo/AddSEOData" (dict "seo" $params "Page" $) }}
-{{ end }}
-
-{{ return $params }}
+{{ return $s.Get "params" }}
