@@ -1,6 +1,15 @@
 # Hugo SEO Module
 
-Hugo Module to quickly add sensible -- yet highly extendable -- SEO/opengraph metatags.
+Handles all of your SEO needs:
+
+- Meta tags
+- Facebook opengraph meta tags
+- Twitter card tags
+- Sitemap
+- XML feeds
+- Robots.txt
+- JSON-LD breadcrumbs
+- JSON-LD article (see config below to set .types for article)
 
 ## Requirements
 
@@ -31,142 +40,161 @@ module:
 Drop the following in your websites HEAD
 
 ```
-{{ if templates.Exists "partials/seo/tags.html" }}
-  {{ partial "seo/tags.html" . }}
-{{ end }}
+{{ partial "hugo-seo/tags.html" . }}
 ```
 
 The above partials, will look for content information and build an Data object to be printed in SEO tags (og, twitter card etc...).
 
-### Add/Modify SEO Data
+> Note:
+>
+> By default the module creates a `<title>` tag. This can be disabled with configuration, see below.
 
-The module parses some data for each page in order to produce the right SEO tags.
-If you need to alternate the data model, you can do so by adding to your project a `layouts/partials/tnd-seo/AddSEOData.html` partial and add to it as explained [here](/partials/AddSEOData.html).
+## Site Config
 
-From the partial you can access the SEO Data model with `.seo`.
+Settings are added to the project's params under the `seo` map as shown below.
 
-Here is the Data model before user modification:
-
-```
-canonical: String (ex: https://example.com/that-page)
-description: String
-image: String
-image_absolute: String (same as the above)
-image_relative: String
-jsonld: Map
-locale: String (ex: en)
-private: Boolean
-site_name: String
-title: String (ex: That Page | That Site)
-translations: Slice
-  - code: String
-    permalink: String
-twitter_card: summary_large_image
-type: website
-```
-
-### Example
-
-In this example we need to focus our efforts on the site recipes and
-
-1. Use a custom parameter for the SEO description
-2. Prepend a CDN url to the relative value of the SEO image
-
-```
-{{/* layouts/partials/AddSEOData.html */}}
-{{ $s := newScratch }}
-{{ $s.Set "seo" dict }}
-
-{{ if eq .Type "recipe" }}
-  {{ with .Page.Params.recipe_incentive }}
-    {{ $s.SetInMap "seo" "description" . }}
-  {{ end }}
-  {{ with .seo.image_relative }}
-    {{ $s.SetInMap "seo" "image" (print "https://assets.recipeyaya.com/images" .) }}
-  {{ end }}
-{{ end }}
-
-{{/* Merge is important here as we want to overwrite the default data model with user's edits */}}
-{{ return merge .seo ($s.Get "seo") }}
-```
-
-### Settings
-
-Settings are added to the project's parameter under the `tnd_seo` map as shown below.
+Defaults have been shown.
 
 ```yaml
 # config.yaml
+title: Set your site's title here
+enableRobotsTXT: true # this is set for you, but don't set it to false in your site!
 params:
-  tnd_seo:
-    # overrides .Site.Title
-    site_name: MyWebsite
-    # Used for articles without images
-    default_image: "/images/default.jpg"
-    # if true will use the SEO data object to output an json+ld script tag.
-    jsonld: true
-    disable_title_tag: false
-    # if true module will handle follow/nofollow tags for pages depending on environment and Front Matter setting.
-    enable_follow: false
+  description: Default SEO description for pages without one.
+  seo:
+    generate: # choose which tags are generated
+      title: true
+      meta: true
+      twitter: true
+      og: true
+      jsonld:
+        article: true # only generated for .types configured in articleTypes or eventTypes
+        breadcrumbs: true
+    titleSeparator: "|" # the character used in between the two strings for the title if not home page.
+    siteName: # site title override (for og/twitter)
+    ogArticleTypes: [post, posts, blog, news, article, articles, event, events]
+    jsonldArticleTypes: [post, posts, blog, news, article, articles, event, events]
+    image: # set default here, page override can be set. 
+    private: false # makes the whole site private, see below.
 ```
 
-#### Title tag
+### Site Title
 
-Maybe website or theme handle their own `<title>` tag and removing it can be tricky. Even though by default the Module will handle the tag for your, you can prevent such behaviour by adding `disable_title` to the settings.
+Set the sites title in the site config.
+
+### enableRobotsTXT
+
+This has already been set to true in the modules config. DO NOT have `enableRobotsTXT: false` in your site config, because it will override the SEO module.
 
 
-#### Private pages
+### params.description
 
-If the configuration value of `enable_follow` is set to `true`, the site's meta robots tags will be set for the site to be discoverable:
+Set a default description that will be used if the page does not have a description or summary.
 
-```
-<meta content="index, follow" name=robots>
-```
+### params.seo.generate
 
-This setting can be overridden on a page-by-page-basis with the following front matter:
+Here you an disable the generation of different tag types. This can also be set at a page level if you wish to disable a tag just for one page e.g. params.seo.generate.jsonld.article: false if you are custom generating an event json-ld script for that page.
 
-```
+The module generates a title tag. If you can't disable your theme's title, change the config to false.
+
+### params.seo.titleSeparator
+
+The home page has <title>{ site title}</title>
+
+Other pages have <title>{page title} | { site title } </title>
+
+You can change the separator from "|" to another character e.g. "-"
+
+### params.seo.siteName
+
+You can set a site title overide for use in the open graph tag.
+
+### params.seo.ogArticleTypes
+
+The types in the array will be recognised as articles for opengraph tag generation.
+
+### params.seo.jsonldArticleTypes
+
+The types in the array will have a json-ld article script generated.
+
+### params.seo.image
+
+Provide a default image should a page not have use. It can be a global resource (assets dir) or static file (static dir) path.
+
+#### params.seo.private
+
+If site config has private: true set, the following will take place:
+
+- `<meta name="robots" content="noindex, nofollow" >`
+- robots.txt: `Disallow: *`, no link to sitemap
+- RSS feeds: disabled
+- Sitemap: empty file
+
+You can set seo.private: true at a site level to make every page public.
+
+This can be overriden at a page level e.g.
+
+site:  params.seo.private: false
+
+AND
+
+```markdown
+---
+# content/private/index.md (see below)
 seo:
   private: true
+---
 ```
 
-The page above, when in production will sport the nofollow/noindex meta tag.
+Will result in the following output:
 
-```
-<meta content="noindex, nofollow" name=robots>
-```
-
-Alternatively, you can set all pages to be private using Hugo's [front matter cascade](https://gohugo.io/content-management/front-matter#front-matter-cascade):
-
-```
-cascade:
-  seo:
-    private: true
-```
-
-Note: If `enable_follow` is set to `true`, the module will print a `nofollow, noindex` tag for every pages unless
-
-- The environment variable `HUGO_ENV` value is `production`  
-  AND
-- `seo.private` is not set or equals to `false`
+- `<meta name="robots" content="noindex, nofollow" >` for 1 page and the rest `<meta name="robots" content="index, follow" >`
+- robots.txt: `Disallow: /private/index.html`, sitemap linked
+- RSS feeds: /private/index.html omitted
+- Sitemap: /private/index.html omitted
 
 ### Front Matter
 
-Some values generated by the Module's logic can be overwritten using the `seo` Front Matter map.
+The module uses title, description, summary and type from frontmatter.
 
-```
+Additionally there is a `seo` map for overrides specific to the module. 
+
+Add any of the configurations to override your site configuration.
+
+```markdown
 ---
-title: Out of context
-description: That's dull!
+title: Page title
+description: Takes precedence over summary
+summary: Page summary
+type: set the type, the module may categorise the page as an article or event.
 seo:
-  title: Intersting Title
-  image: /uploads/way-better-that-this-post-featured.png
-  description: A catchy phrase.
+  generate: # set to false to disable a tag
+    title: true
+    meta: true
+    twitter: true
+    og: true
+    jsonld:
+      article: true
+      breadcrumbs: true
+  title: Overrides the page title
+  image: path to page resource, or static file
+  description: Overrides page description
+  canonical: path to actual page if this is a duplicate
+---
 ```
 
-### Extend SEO Data
+> Note:
+>
+> Don't copy and paste in this whole list, as it may override many of your defaults in site config!
 
-In order to customize the SEO Data consumed by Hugo to build the tags. User can create on the project level a `tnd-seo/AddSEOData` partial.
+## Credits
 
-## theNewDynamic
+Sean Emerson - Future Web Design
 
-This project is maintained and loved by [thenewDynamic](https://www.thenewdynamic.com).
+Originally forked from tnd-seo by [thenewDynamic](https://www.thenewdynamic.com).
+
+## Errors, Feature requests and Contributions
+
+Log an error or feature request as an issue.
+
+PR's are welcome.
