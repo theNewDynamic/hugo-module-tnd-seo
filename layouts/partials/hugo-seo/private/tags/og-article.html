@@ -1,0 +1,17 @@
+{{ $s := newScratch }}
+{{ $s.Set "article" dict  }}
+
+{{/* add more conditions, so not generated for non article page */}}
+{{ if .page.IsPage }}
+  {{ with .section }}
+    {{ $s.SetInMap "article" "section" . }}
+  {{ end }}
+  {{ with .published_time }}
+    {{ $s.SetInMap "article" "published_time" . }}
+  {{ end }}
+  {{ with .modified_time }}
+    {{ $s.SetInMap "article" "modified_time" . }}
+  {{ end }}
+{{ end }}
+
+{{ return $s.Get "article" }}

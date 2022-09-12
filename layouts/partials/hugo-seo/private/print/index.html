@@ -1,0 +1,15 @@
+{{- with .title }}
+{{ printf "<title>%s</title>" .| safeHTML }}
+{{- end }}
+{{- with .meta }}
+  {{- partial "hugo-seo/private/print/meta.html" . }}
+{{- end }}
+{{- if .og }}
+  {{- partial "hugo-seo/private/print/og.html" . }}
+{{- end -}}
+{{- with .twitter }}
+  {{- partial "hugo-seo/private/print/twitter.html" . }}
+{{- end }}
+{{- with .jsonld }}
+  {{- partial "hugo-seo/private/print/jsonld.html" . }}
+{{- end -}}

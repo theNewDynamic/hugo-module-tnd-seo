@@ -1,0 +1,5 @@
+{{- range . }}
+<script type="application/ld+json">
+{{ . | jsonify (dict "indent" "  ") | safeJS }}
+</script>
+{{- end }}

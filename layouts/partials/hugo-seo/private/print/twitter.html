@@ -1,0 +1,3 @@
+{{- range $key, $value :=. }}
+{{ printf `<meta name="twitter:%s" content="%s">` $key $value | safeHTML }}
+{{- end }}

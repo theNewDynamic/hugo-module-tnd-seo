@@ -1,0 +1,3 @@
+imports:
+- path: github.com/future-wd/hugo-seo
+replacements: "github.com/future-wd/hugo-seo -> ../../"

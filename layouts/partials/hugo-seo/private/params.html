@@ -1,0 +1,336 @@
+{{/* 
+	Structure SEO Data for a given page
+	+ print tags
+	+ print jsonld
+	
+	@author The New Dynamic
+	
+	@access public
+
+	@context Page 
+
+	@example - Go Template
+		{{ partial "hugo-seo/tags" . }}
+
+  TODO:
+    - [ ] Improve type test on "events", `article` seems very opinated.
+		- [ ] Find a reasonable default image when `site.Params.default_image` is not set.
+		- [ ] Twitter can sport "author" handle on top of the site's. Devise a test for author? 
+		- [ ] Maybe consider another approach to set the twitter_card (summary, etc...)
+		- [ ] Not sure about image size. Following https://docs.imgix.com/best-practices/improving-seo-traffic, we have a 
+			square of 800x800 */}}
+
+ 
+{{/*------------------------------
+	BUILDING SCRATCH SEO OBJECT
+	------------------------------ */}}
+
+{{ $config := site.Params.seo }}
+
+{{/* Adding the seo map to scratch which will recieve SEO key/value pairs. */}}
+{{ $s := newScratch }}
+{{ $s.Set "params" dict  }}
+
+{{  $s.SetInMap "params" "page" .Page   }}
+
+{{/* Dates
+	----------------------------- */}}
+
+{{  if not .PublishDate.IsZero  }}
+{{  $s.SetInMap "params" "published_time" (.PublishDate.Format "2006-01-02T15:04:05-07:00")  }}
+{{  else if not .Date.IsZero  }}
+{{  $s.SetInMap "params" "published_time" (.Date.Format "2006-01-02T15:04:05-07:00")  }}
+{{  end  }}
+{{  if not .Lastmod.IsZero  }}
+{{  $s.SetInMap "params" "modified_time" (.Lastmod.Format "2006-01-02T15:04:05-07:00")  }}
+{{  end  }}
+
+{{/* Description
+	----------------------------------------
+	We use the following order of precedence
+	1. SEO Description, then, if not found,
+	2. Page Description, then if not found,
+	3. Page Summary then, if not found,
+	4. Site params SEO Description  
+  5. Site params description 
+  As it could potentially contain HTML tags, 
+  we strip them with plainify                   */}}
+{{ $description := "" }}
+{{/* 1. SEO Description */}}
+{{ if .Params.seo.description }}
+	{{ $description = .Params.seo.description }}
+{{/* 2. Description */}}
+{{ else if .Description }}
+	{{ $description = .Description }}
+{{/* 3. Summary */}}
+{{ else if .Summary }}
+	{{ $description = .Summary }}
+{{/* 4. site params seo description */}}
+{{ else if $config.Description }}
+  {{ $description = site.Description }}
+{{/* 5. Site params description */}}
+{{  else  }}
+{{ $description = site.Params.description }}
+{{ end }}
+
+{{ with $description }}
+	{{/* We make sure text is sanitzed before storing as data (to avoid html or markdown) */}}
+	{{ $s.SetInMap "params" "description" (. | markdownify | plainify) }}
+{{ end }}
+
+{{/* page title
+  ----------------------------
+1. Page seo title 
+2. Page title  */}}
+{{ $title := .Title }}
+{{ with .Params.seo.title }}
+	{{ $title = . }}
+{{ end }}
+{{ $s.SetInMap "params" "title" $title }}
+
+{{/* Site title
+  ----------------------------
+1. Site title 
+2. Poorly config'd site title  */}}
+{{ $siteTitle := false }}
+{{ with site.Title }}
+  {{ $siteTitle = . }}
+{{ else }}
+  {{ $siteTitle = site.Params.Title }}
+{{ end }}
+ 
+{{/* Title Tag
+  ---------------------------- 
+	We use the following logic
+	1. Every pages: `{$title} | {$siteTitle}`
+	2. Homepage: , only {$siteTitle}
+  "|" title seperator is configured @ site.Params.seo.titleSeparator */}}
+{{ if not .IsHome }}
+	{{/* 1. All except home page */}}
+	{{  $s.SetInMap "params" "title_tag" (printf "%s %s %s" $title $config.titleSeparator site.Title)  }}
+{{ else }}
+	{{/* 2. Home page */}}
+	{{ $s.SetInMap "params" "title_tag" site.Title }}
+{{ end }}
+
+{{/* Site Name 
+	---------------------------- */}}
+{{ with $config.siteName }}
+	{{ $s.SetInMap "params" "siteName" . }}
+{{ else }}
+	{{ $s.SetInMap "params" "siteName" site.Title  }}
+{{ end }}
+
+{{/* Image
+	---------------------------- */}}
+{{ $img := false }}
+{{ $imgRes := false }}
+
+{{  with .Params.seo.image  }}
+  {{ with $.Resources.GetMatch . }}
+	  {{  $img = .RelPermalink  }}
+    {{ $imgRes = . }}
+  {{ else }}
+    {{  $img = .  }}
+  {{ end }}
+{{ else }}
+	{{/* If no SEO IMAGE is set, we look for the .Params.images slice
+		and use the first one  */}}
+  {{ with .Params.images  }}
+    {{ with index . 0  }}
+      {{ with $.Resources.GetMatch "test.jpg" }}
+        {{ $imgRes = . }}
+        {{  $img = .RelPermalink  }}
+      {{ else }}
+        {{  $img = .  }}
+      {{ end }}
+    {{ end }}
+  {{  end  }}
+{{  end  }}
+
+{{/* if image isnt found via page seo.image or .images array, use site config */}}
+{{ if not $img }}
+  {{ with $config.seo.image }}
+    {{ with resources.GetMatch . }}
+      {{ $imgRes = . }}
+      {{  $img = .RelPermalink  }}
+    {{ else }}
+      {{  $img = .  }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+	
+
+
+{{/* Finally if after all of the conditional above we are not able to find an image for the page,
+	we resolve to looking for the following: */}}
+{{ if not $img }}
+	{{  $img_defaults := slice "/static/logo.jpg" "/static/logo.png" "/uploads/default.jpg"  }}
+	{{ range $path := $img_defaults }}
+		{{ if fileExists . }}
+			{{ $img = strings.TrimLeft "/static" $path }}
+		{{ end }}
+	{{ end }}
+{{ end }}
+
+{{ with $img }}
+	{{ $s.SetInMap "params" "image" ( . | absURL) }}
+  {{ with $imgRes.Height }}
+    {{ $s.SetInMap "params" "image_height" ( . | string) }}
+    {{ $s.SetInMap "params" "image_width" ( $imgRes.Width | string) }}
+  {{ else }}
+    {{ $data := imageConfig $img }} 
+    {{ $s.SetInMap "params" "image_height" ($data.Height | string) }}
+    {{ $s.SetInMap "params" "image_width"  ($data.Height | string) }}
+  {{ end }}
+{{ end }}
+
+
+
+
+{{/* We check for the private param */}}
+{{ with .Param "seo.private" }}
+	{{ $s.SetInMap "params" "private" . }}
+{{ end }}
+
+
+
+
+{{/* Type
+	---------------------------- */}}
+{{  $s.SetInMap "params" "type" "website" }}
+
+{{  if in $config.articleTypes .Type  }}
+	{{  $s.SetInMap "params" "type" "article"  }}
+{{ else if in $config.eventTypes .Type }}
+	{{  $s.SetInMap "params" "type" "event"  }}
+{{  end  }}
+
+
+
+
+{{/* Locale and translations
+	---------------------------- */}}
+{{  $s.SetInMap "params" "locale" .Lang }}
+
+{{ $translations := slice }}
+{{ if .IsTranslated }}
+	{{ range .Translations }}
+			{{ $translations = $translations | append (dict "code" .Lang "permalink" .Permalink) }}
+	{{ end }}
+{{ $s.SetInMap "params" "translations" $translations }}
+{{ end }}
+
+
+{{/* Canonical
+---------------------------- */}}
+{{/* .IsNode is for list pages */}}
+{{ if .IsNode }}
+  {{  $s.SetInMap "params" "canonical" (.Paginator.URL | absURL) }}
+  {{/* don't generate prev and next for home page (which is a node/list page) */}}
+  {{ if not .IsHome }}
+    {{ if .Paginator.HasPrev -}}
+      {{  $s.SetInMap "params" "prev" (.Paginator.Prev.URL | absURL) }}
+    {{ end }}
+    {{ if .Paginator.HasNext -}}
+      {{  $s.SetInMap "params" "next" (.Paginator.Next.URL | absURL) }}
+    {{ end }}
+  {{ end }}
+{{ else }}
+{{/* standard pages */}}
+  {{ with .Params.seo.canonical }}
+    {{  $s.SetInMap "params" "canonical" (. | absURL)  }}
+  {{ else }}
+    {{  $s.SetInMap "params" "canonical" .Permalink  }}
+  {{ end }}
+{{ end }}
+
+{{/* meta only
+	---------------------------- */}}
+{{ with .AlternativeOutputFormats }}
+  {{ $s.SetInMap "params" "alternativeOutputFormats" . }}
+{{ end }}
+
+
+{{/* Twitter card params
+	---------------------------- */}}
+{{ with $img }}
+	{{/* Most of the time we should have an image */}}
+	{{  $s.SetInMap "params" "twitter_card" "summary_large_image"  }}
+{{ else }}
+	{{/* For edge cases without: */}}
+	{{  $s.SetInMap "params" "twitter_card" "summary"  }}
+{{ end }}
+
+{{/* We check the site config sports a Social.twitter and use as handle */}}
+{{  with .Site.Social.twitter  }}
+	{{  $s.SetInMap "params" "twitter_site" (printf "@%s" .)  }}
+{{  end  }}
+
+{{/* We check the page params have author.twitter and use as handle */}}
+{{  with .Params.author.twitter  }}
+	{{  $s.SetInMap "params" "twitter_creator" (printf "@%s" .)  }}
+{{  end  }}
+
+
+
+
+{{/* open graph specific
+	----------------------------- */}}
+{{ with .Section }}
+  {{  $s.SetInMap "params" "section" .  }}
+{{ end }}
+
+{{- with .Params.audio }}
+  {{  $s.SetInMap "params" "audio" ( . | absURL)  }}
+{{ end }}
+
+{{- with .Params.videos }}
+  {{- with index . 0 }}
+    {{  $s.SetInMap "params" "video" ( . | absURL)  }} />
+  {{ end }}
+{{ end }}
+
+{{- with .Params.video }}
+  {{  $s.SetInMap "params" "video" ( . | absURL)  }} />
+{{ end }}
+
+
+{{/* og:see_also
+  get from related content type... research
+  <meta property="og:see_also" content="{{ $page.Permalink }}" />
+
+*/}}
+
+
+{{/* jsonld specific
+	----------------------------- */}}
+
+{{- with .WordCount }}
+  {{  $s.SetInMap "params" "wordcount" .  }}
+{{ end }}
+
+
+{{  with .Params.author.name  }}
+  {{ $s.SetInMap "params" "author_name" . }}
+{{ end }}
+
+{{ with .Params.author.url }}
+  {{ $s.SetInMap "params" "author_url" . }}
+{{ end }}
+
+{{ with .Parent }}
+  {{ $s.SetInMap "params" "parent" . }} 
+{{ end }}
+
+
+{{/* merge additions
+	----------------------------- */}}
+
+{{ $params := $s.Get "params" }}
+
+{{ if templates.Exists "partials/hugo-seo/AddSEOData.html" }}
+  {{ $params = partial "hugo-seo/AddSEOData" (dict "seo" $params "Page" $) }}
+{{ end }}
+
+{{ return $params }}

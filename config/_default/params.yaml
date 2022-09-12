@@ -1,14 +1,28 @@
-seo:
-  titleTag: false # true to generate a title tag for each page
-  siteTitle: # site title override (only site params)
-  canonical: # page ref (site only)
-  enableFollowMeta: true # enable index,follow meta if private != true and production env
-  # page or site
-  image: # set default here, page override can be set.
+# (site.Title used by seo for title tag and others)
+# (site.Social.twitter (with no @))
 
+seo:
+  # site only
+  generate:
+    title: true
+    meta: true
+    twitter: true
+    og: true
+    jsonld:
+      article: true
+      breadcrumbs: true
+  titleSeparator: "|"
+  siteName: # site title override (for og/twitter)
+  articleTypes: [post, posts, blog, news]
+  eventTypes: [article]
+  # page or site
+  image: # set default here, page override can be set. 
+  private: false # set here or per page to modify robots meta, remove sitemap, robots and rss listing for page(s)
+    
   # page only
-  # title: # page title override 
-  # private: true 
+  # title: # page title override for title tag, og and twitter
+  # description: # override other descriptions for seo
+  # canonical: # add page ref to override .Permalink for canonical
 
 
 # page params
@@ -17,13 +31,6 @@ seo:
 #   summary: 
 # .publishDate #precedence over .date
 # .date
-# .lasmode
+# .lasmod
 
-# .Site.Social.twitter (with no @)
-
-# .type blog, news > article
-# .type article > event 
-# use config???
-
-# translations > .lang
 
