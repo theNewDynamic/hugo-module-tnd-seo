@@ -5,14 +5,13 @@ title: # set the site title here, seo.title page/site config is an override
 # adds newer content older page's related content
 related:
   includeNewer: true
+  threshold: 0
+  toLower: true
   indices:
   - name: keywords
     weight: 100
-  - name: date
-    weight: 10
-  - name: type
-    weight: 90
-  - tags:
+  - name: categories
+    weight: 50
+  - name: tags
     weight: 80
-  threshold: 80
-  toLower: false
+

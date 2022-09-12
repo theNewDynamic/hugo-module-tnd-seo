@@ -13,8 +13,8 @@ seo:
       breadcrumbs: true
   titleSeparator: "|"
   siteName: # site title override (for og/twitter)
-  articleTypes: [post, posts, blog, news]
-  eventTypes: [article, articles, event, events]
+  ogArticleTypes: [post, posts, blog, news, article, articles, event, events]
+  jsonldArticleTypes: [post, posts, blog, news, article, articles, event, events]
   # page or site
   image: # set default here, page override can be set. 
   private: false # set here or per page to modify robots meta, remove sitemap, robots and rss listing for page(s)
