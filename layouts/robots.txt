@@ -1,14 +1,25 @@
 User-agent: *
-{{- if eq site.Params.seo.private true }}
+{{- $private := slice }}
+{{- range .Data.Pages }}
+  {{- if eq (.Param "seo.private") true }}
+    {{- $private = $private | append . }}
+  {{- end }}
+{{- end }}
+{{- if eq (len $private) 0 }}
+Allow: * 
+{{- end }}
+{{- if eq (len $private) (len .Data.Pages) }}
 Disallow: *
 {{- else }}
-  {{- $private := where .Data.Pages "Params.seo.private" true -}}
-  {{ if eq (len $private) 0 }}
-Allow: * 
-  {{ else }}
-    {{- range $private }}
+{{ range $private }}
 Disallow: {{ .RelPermalink }}
-    {{- end }}
-  {{- end -}}
-{{- end -}}
+{{ end }}
+{{ end }}
+{{- with site.BaseURL }}
+Sitemap: {{ . }}sitemap.xml
+{{- end }}
+
+
+
+
 
