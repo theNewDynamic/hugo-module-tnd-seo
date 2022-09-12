@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/future-wd/hugo-seo/compare/v1.0.0...v1.0.1) (2022-09-12)
+
+
+### Bug Fixes
+
+* add more event types to default config ([59cdae9](https://github.com/future-wd/hugo-seo/commit/59cdae9246465e3abe6524c7a0eb4f636ec17986))
+* add package.json ([6947de2](https://github.com/future-wd/hugo-seo/commit/6947de2c9043a04362c066222338260b66e36c92))
+* json article types ([f727d62](https://github.com/future-wd/hugo-seo/commit/f727d62a8f20672ccb748923bbec83b053e63862))
+* og related pages ([de7e237](https://github.com/future-wd/hugo-seo/commit/de7e237bb86beb709d5f26785f48b28a15840251))
+* range for og ([55bb99f](https://github.com/future-wd/hugo-seo/commit/55bb99f2a8f0ba594a94420c0b6e465160ee26ae))
+* robots.txt uses .Param seo.private ([8db99bf](https://github.com/future-wd/hugo-seo/commit/8db99bf7d70fb42a563f8717f7d454b2368bb3ed))
+* sitemap link ommited if all pages private ([5634a82](https://github.com/future-wd/hugo-seo/commit/5634a82bcddc38ff69fe6dfcd73729da19eb152a))
+* sitemap/rss use .Param seo.private ([795e4c3](https://github.com/future-wd/hugo-seo/commit/795e4c304449782f95512da50878955855486119))
+* typo ([418355b](https://github.com/future-wd/hugo-seo/commit/418355b55f98ec17b1a3708a7af980931c6b146e))
+
 ## [1.0.0](https://github.com/future-wd/hugo-seo/compare/v0.1.10...v1.0.0) (2022-09-12)
 
 
