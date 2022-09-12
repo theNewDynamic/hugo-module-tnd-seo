@@ -1,10 +1,12 @@
 {{ $s := newScratch }}
 {{ $s.Set "og" dict  }}
 
-
 {{ $s.SetInMap "og" "url" .canonical }}
 {{ $s.SetInMap "og" "title" .title }}
 {{ $s.SetInMap "og" "locale" .locale }}
+{{ $s.SetInMap "og" "site_name" .site_name }}
+{{ $s.SetInMap "og" "type" .ogType }}
+{{ $s.SetInMap "og" "section" .section }}
 
 {{ with .description }}
   {{ $s.SetInMap "og" "description" . }}
@@ -19,16 +21,10 @@
   {{ with $.image_height }}
     {{ $s.SetInMap "og" "image:height" . }}
   {{ end }}
+  {{/* add image type if page resource */}}
+  {{ with $.image_type }}
+  {{ $s.SetInMap "og" "image:type" . }}
 {{ end }}
-
-
-
-{{ with .type }}
-  {{ $s.SetInMap "og" "type" . }}
-{{ end }}
-
-{{ with .section }}
-  {{ $s.SetInMap "og" "section" . }}
 {{ end }}
 
 {{ with .audio }}
@@ -39,13 +35,38 @@
   {{ $s.SetInMap "og" "video" . }}
 {{ end }}
 
-{{ with .site_name }}
-  {{ $s.SetInMap "og" "site_name" . }}
+
+{{/* these are array's need to be ranged over in print template 
+      they are added to ogArray key to keep them seperate*/}}
+{{ $s.Set "ogArray" dict  }}
+
+{{ with .locale_alternate }}
+  {{ $s.SetInMap "ogArray" "locale_alternate" . }}
 {{ end }}
 
-{{ $related := first 6 (site.RegularPages.Related .page) }}
-{{ with $related }}
-  {{ $s.SetInMap "og" "related" .Permalink }}
+{{ with .see_also }}
+{{ $s.SetInMap "ogArray" "see_also" . }}
 {{ end }}
 
-{{ return $s.Get "og" }}
+
+{{/* these are article tags */}}
+{{ $s.Set "article" dict  }}
+
+{{/* add more conditions, so not generated for non article page */}}
+{{ if .page.IsPage }}
+  {{ with .section }}
+    {{ $s.SetInMap "article" "section" . }}
+  {{ end }}
+  {{ with .published_time }}
+    {{ $s.SetInMap "article" "published_time" . }}
+  {{ end }}
+  {{ with .modified_time }}
+    {{ $s.SetInMap "article" "modified_time" . }}
+  {{ end }}
+{{ end }}
+
+{{ return (dict 
+  "single" ($s.Get "og") 
+  "array" ($s.Get "ogArray")  
+  "article" ($s.Get "article")  
+  ) }}

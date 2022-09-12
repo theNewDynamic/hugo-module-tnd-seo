@@ -12,10 +12,10 @@
 
 {{ if eq (.page.Param "seo.generate.og") true }}
   {{ $og := partial "hugo-seo/private/tags/og" . }}
-  {{ $s.SetInMap "tags" "og" $og }}
-  {{ if and (eq .type "article") (not .IsNode) }}
-    {{ $article := partial "hugo-seo/private/tags/og-article" . }}
-    {{ $s.SetInMap "tags" "article" $article }}
+  {{ $s.SetInMap "tags" "og" $og.single }}
+  {{ $s.SetInMap "tags" "ogArray" $og.array }}
+  {{ if and (eq .ogType "article") (not .IsNode) }}
+    {{ $s.SetInMap "tags" "article" $og.article }}
   {{ end }}
 {{ end }}
 
@@ -26,11 +26,11 @@
 
 {{ $jsonld := slice}}
 
-{{/* only display article for .type article and not list pages, if enabled */}}
+{{/* only display article for .jsonldType article and not list pages, if enabled */}}
 {{ if and 
   (eq (.page.Param "seo.generate.jsonld.article") true)
   (and 
-    (eq .type "article")
+    (eq .jsonldType "article")
     (not .page.IsNode)) }}
   {{ $jsonld_article := partial "hugo-seo/private/tags/jsonld-article" . }}
   {{ $jsonld = $jsonld | append $jsonld_article }}
