@@ -1,0 +1,30 @@
+{
+  "name": "hugo-seo",
+  "version": "1.0.0",
+  "description": "Manage all of your Hugo SEO needs from one place!",
+  "main": "layouts/partials/hugo-seo/tags.html",
+  "scripts": {
+    "release": "standard-version",
+    "release:dry-run": "standard-version --dry-run",
+    "git:push": "git push --follow-tags origin master",
+    "update": "npx npm-check --update"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/future-wd/hugo-seo.git"
+  },
+  "keywords": [
+    "hugo",
+    "seo",
+    "module"
+  ],
+  "author": "Sean Emerson (Future Web Design)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/future-wd/hugo-seo/issues"
+  },
+  "homepage": "https://github.com/future-wd/hugo-seo#readme",
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  }
+}
