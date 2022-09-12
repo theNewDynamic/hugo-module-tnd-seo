@@ -36,16 +36,14 @@
 {{ end }}
 
 
-{{/* these are array's need to be ranged over in print template 
-      they are added to ogArray key to keep them seperate*/}}
-{{ $s.Set "ogArray" dict  }}
+{{/* these are array's need to be ranged over in print template */}}
 
 {{ with .locale_alternate }}
-  {{ $s.SetInMap "ogArray" "locale_alternate" . }}
+  {{ $s.SetInMap "og" "locale_alternate" . }}
 {{ end }}
 
 {{ with .see_also }}
-{{ $s.SetInMap "ogArray" "see_also" . }}
+{{ $s.SetInMap "og" "see_also" . }}
 {{ end }}
 
 
@@ -66,7 +64,6 @@
 {{ end }}
 
 {{ return (dict 
-  "single" ($s.Get "og") 
-  "array" ($s.Get "ogArray")  
+  "og" ($s.Get "og")  
   "article" ($s.Get "article")  
   ) }}

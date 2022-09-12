@@ -1,13 +1,12 @@
 {{- with .og }}
 {{- range $key, $value :=. }}
-{{ printf `<meta property="og:%s" content="%s">` $key $value | safeHTML }}
-{{- end }}
-{{- end }}
-{{- with .ogArray }}
-{{- range $key, $value :=. }}
+{{- if reflect.IsSlice . -}}
 {{- range $value }}
 {{ printf `<meta property="og:%s" content="%s">` $key . | safeHTML }}
 {{- end }}
+{{- else }}
+{{ printf `<meta property="og:%s" content="%s">` $key $value | safeHTML }}
+{{- end -}}
 {{- end }}
 {{- end }}
 {{- with .article }}

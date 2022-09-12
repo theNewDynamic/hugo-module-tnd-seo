@@ -199,24 +199,7 @@
 
 
 
-{{/* Type
-	---------------------------- */}}
-
-{{/* choose between website and article for OG */}}
-{{  if in $config.ogArticleTypes .Type  }}
-	{{  $s.SetInMap "params" "ogType" "article"  }}
-{{ else }}
-  {{  $s.SetInMap "params" "ogType" "website" }}
-{{ end }}
-
-{{/* add jsonld type of article if match */}}
-{{  if in $config.jsonldArticleTypes .Type  }}
-	{{  $s.SetInMap "params" "jsonldType" "article"  }}
-{{ end }}
-
-
-
-{{/* Locale and 
+{{/* Locale 
 	---------------------------- */}}
 {{  $s.SetInMap "params" "locale" .Lang }}
 
@@ -276,6 +259,14 @@
 
 {{/* currently open graph specific
 	----------------------------- */}}
+
+{{/* choose between website and article for OG */}}
+{{  if in $config.ogArticleTypes .Section  }}
+  {{  $s.SetInMap "params" "ogType" "article"  }}
+{{ else }}
+  {{  $s.SetInMap "params" "ogType" "website" }}
+{{ end }}
+
 {{ with .Section }}
   {{  $s.SetInMap "params" "section" .  }}
 {{ end }}
@@ -294,9 +285,10 @@
   {{  $s.SetInMap "params" "video" ( . | absURL)  }} />
 {{ end }}
 
-
-
-{{ $related := .Site.RegularPages.Related . | first 6 }}
+{{ $related := where (site.RegularPages.Related .) "Section" .Section | first 6 }}
+{{ if not $related }}
+{{ $related = where site.RegularPages.ByDate "Section" .Section | first 6 }}
+{{ end }}
 {{ with $related }}
   {{ $relatedArray := slice }}
   {{ range . }}
@@ -317,18 +309,36 @@
 {{/* currently jsonld specific
 	----------------------------- */}}
 
-{{- with .WordCount }}
+{{/* add jsonld type of article if match */}}
+{{  if in $config.jsonldArticleTypes .Section  }}
+	{{  $s.SetInMap "params" "jsonldType" "Article"  }}
+{{ else if (in $config.jsonldNewsArticleTypes .Section)  }}
+	{{  $s.SetInMap "params" "jsonldType" "NewsArticle"  }}
+{{ else if (in $config.jsonBlogPostingTypes .Section)  }}
+	{{  $s.SetInMap "params" "jsonldType" "BlogPosting"  }}
+{{ end }}
+
+{{/* remove /n from end of plainified content */}}
+{{ $articleBody := trim (.Content | plainify ) "\n" }}
+{{  $s.SetInMap "params" "articleBody" $articleBody  }}
+
+{{ with .WordCount }}
   {{  $s.SetInMap "params" "wordcount" .  }}
 {{ end }}
 
-
-{{  with .Params.author.name  }}
-  {{ $s.SetInMap "params" "author_name" . }}
+{{ $authors := slice }}
+{{ with .Params.authors }}
+  {{ $authors = . }}
+{{ else }}
+  {{ with .Params.author }}
+    {{ $authors = (slice .) }}
+  {{ end }}
 {{ end }}
 
-{{ with .Params.author.url }}
-  {{ $s.SetInMap "params" "author_url" . }}
+{{ with $authors }}
+{{ $s.SetInMap "params" "authors" .  }}
 {{ end }}
+
 
 {{ with .Parent }}
   {{ $s.SetInMap "params" "parent" . }} 
