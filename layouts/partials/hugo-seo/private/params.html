@@ -138,7 +138,7 @@
 		and use the first one  */}}
   {{ with .Params.images  }}
     {{ with index . 0  }}
-      {{ with $.Resources.GetMatch "test.jpg" }}
+      {{ with $.Resources.GetMatch . }}
         {{ $imgRes = . }}
         {{  $img = .RelPermalink  }}
       {{ else }}
@@ -192,9 +192,9 @@
 {{/* We check for the private param 
   site.Params.seo.private: true will make
   the following return true also */}}
-{{ with .Param "seo.private" }}
-	{{ $s.SetInMap "params" "private" . }}
-{{ end }}
+{{ $private :=  .Param "seo.private" }}
+{{ $s.SetInMap "params" "private" $private }}
+
 
 
 

@@ -1,8 +1,4 @@
-# (site.Title used by seo for title tag and others)
-# (site.Social.twitter (with no @))
-
 seo:
-  # site only
   generate:
     title: true
     meta: true
@@ -25,14 +21,5 @@ seo:
   # title: # page title override for title tag, og and twitter
   # description: # override other descriptions for seo
   # canonical: # add page ref to override .Permalink for canonical
-
-
-# page params
-# params:
-#   description: #precedence over summary
-#   summary: 
-# .publishDate #precedence over .date
-# .date
-# .lasmod
 
 
