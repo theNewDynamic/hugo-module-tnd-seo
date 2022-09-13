@@ -1,69 +1,70 @@
 {{ $s := newScratch }}
-{{ $s.Set "og" dict  }}
+{{ $s.Set "og" slice  }}
 
-{{ $s.SetInMap "og" "url" .canonical }}
-{{ $s.SetInMap "og" "title" .title }}
-{{ $s.SetInMap "og" "locale" .locale }}
-{{ $s.SetInMap "og" "site_name" .site_name }}
-{{ $s.SetInMap "og" "type" .ogType }}
-{{ $s.SetInMap "og" "section" .section }}
+{{ $s.Add "og" (dict "property" "og:url" "content" .canonical) }}
+{{ $s.Add "og" (dict "property" "og:title" "content" .title) }}
+{{ $s.Add "og" (dict "property" "og:locale" "content" .locale) }}
+{{ $s.Add "og" (dict "property" "og:site_name" "content" .site_name) }}
+{{ $s.Add "og" (dict "property" "og:type" "content" .ogType) }}
+{{ $s.Add "og" (dict "property" "og:section" "content" .section) }}
 
 {{ with .description }}
-  {{ $s.SetInMap "og" "description" . }}
+  {{ $s.Add "og" (dict "property" "og:description" "content" . ) }}
 {{ end }}
 
 {{ with .image }}
-  {{ $s.SetInMap "og" "image" . }}
+{{ $s.Add "og" (dict "property" "og:image" "content" . ) }}
   {{/* add image height/width so fb image displays on first share */}}
   {{ with $.image_width }}
-    {{ $s.SetInMap "og" "image:width" . }}
+    {{ $s.Add "og" (dict "property" "og:image:width" "content" . ) }}
   {{ end }}
   {{ with $.image_height }}
-    {{ $s.SetInMap "og" "image:height" . }}
+    {{ $s.Add "og" (dict "property" "og:image:height" "content" . ) }}
   {{ end }}
   {{/* add image type if page resource */}}
   {{ with $.image_type }}
-  {{ $s.SetInMap "og" "image:type" . }}
-{{ end }}
+    {{ $s.Add "og" (dict "property" "og:image:type" "content" . ) }}
+  {{ end }}
 {{ end }}
 
 {{ with .audio }}
-  {{ $s.SetInMap "og" "audio" . }}
+  {{ $s.Add "og" (dict "property" "og:audio" "content" . ) }}
 {{ end }}
 
 {{ with .video }}
-  {{ $s.SetInMap "og" "video" . }}
+  {{ $s.Add "og" (dict "property" "og:video" "content" . ) }}
 {{ end }}
 
 
-{{/* these are array's need to be ranged over in print template */}}
+
 
 {{ with .locale_alternate }}
-  {{ $s.SetInMap "og" "locale_alternate" . }}
+  {{ range . }}
+    {{ $s.Add "og" (dict "property" "og:locale_alternate" "content" . ) }}
+  {{ end }}
 {{ end }}
 
 {{ with .see_also }}
-{{ $s.SetInMap "og" "see_also" . }}
+  {{ range . }}
+    {{ $s.Add "og" (dict "property" "og:see_also" "content" . ) }}
+  {{ end }}
 {{ end }}
 
 
 {{/* these are article tags */}}
-{{ $s.Set "article" dict  }}
+{{ if and (eq .ogType "article") .page.IsPage }}
 
-{{/* add more conditions, so not generated for non article page */}}
-{{ if .page.IsPage }}
   {{ with .section }}
-    {{ $s.SetInMap "article" "section" . }}
+    {{ $s.Add "og" (dict "property" "article:section" "content" . ) }}
   {{ end }}
   {{ with .published_time }}
-    {{ $s.SetInMap "article" "published_time" . }}
+    {{ $s.Add "og" (dict "property" "article:published_time" "content" . ) }}
   {{ end }}
   {{ with .modified_time }}
-    {{ $s.SetInMap "article" "modified_time" . }}
+    {{ $s.Add "og" (dict "property"  "article:modified_time" "content" . ) }}
   {{ end }}
+
 {{ end }}
 
-{{ return (dict 
-  "og" ($s.Get "og")  
-  "article" ($s.Get "article")  
-  ) }}
+
+{{ return $s.Get "og" }}

@@ -5,39 +5,48 @@
   {{ $s.SetInMap "tags" "title" .title_tag }}
 {{ end }}
 
-{{ if eq (.page.Param "seo.generate.twitter") true }}
-  {{ $twitter := partial "hugo-seo/private/tags/twitter" . }}
-  {{ $s.SetInMap "tags" "twitter" $twitter }}
+{{/* set meta tags for standard meta, og, twitter */}}
+{{ $s.Set "meta" slice }}
+
+{{ if eq (.page.Param "seo.generate.meta") true }}
+  {{ $s.Add "meta" (partial "hugo-seo/private/tags/meta" . ) }}
 {{ end }}
 
 {{ if eq (.page.Param "seo.generate.og") true }}
-  {{ $og := partial "hugo-seo/private/tags/og" . }}
-  {{ $s.SetInMap "tags" "og" $og.og }}
-  {{ if and (eq .ogType "article") (not .IsNode) }}
-    {{ $s.SetInMap "tags" "article" $og.article }}
+  {{ $s.Add "meta" (partial "hugo-seo/private/tags/og" . )  }}
+{{ end }}
+
+{{ if eq (.page.Param "seo.generate.twitter") true }}
+  {{ $s.Add "meta" (partial "hugo-seo/private/tags/twitter" . ) }}
+{{ end }}
+
+{{/* add json-ld code blocks */}}
+{{ $s.Set "jsonld" slice }}
+
+{{/* only display article for .json article types and not list pages, if enabled */}}
+{{ if eq (.page.Param "seo.generate.jsonld.article") true }}
+  {{ if and .jsonldType (not .page.IsNode) }}
+    {{ $s.Add "jsonld" (partial "hugo-seo/private/tags/jsonld-article" .) }}
   {{ end }}
 {{ end }}
 
-{{ if eq (.page.Param "seo.generate.meta") true }}
-  {{ $meta := partial "hugo-seo/private/tags/meta" . }}
-  {{ $s.SetInMap "tags" "meta" $meta }}
-{{ end }}
-
-{{ $jsonld := slice}}
-
-{{/* only display article for .json article types and not list pages, if enabled */}}
-{{ if and 
-  (eq (.page.Param "seo.generate.jsonld.article") true)
-  (and .jsonldType (not .page.IsNode) ) }}
-  {{ $jsonld_article := partial "hugo-seo/private/tags/jsonld-article" . }}
-  {{ $jsonld = $jsonld | append $jsonld_article }}
-{{ end }}
-
 {{ if eq (.page.Param "seo.generate.jsonld.breadcrumbs") true }}
-  {{ $jsonld_breadcrumbs := partial "hugo-seo/private/tags/jsonld-breadcrumbs" . }}
-  {{ $jsonld = $jsonld | append $jsonld_breadcrumbs }}
+  {{ $s.Add "jsonld" (partial "hugo-seo/private/tags/jsonld-breadcrumbs" .) }}
 {{ end }}
 
-{{ $s.SetInMap "tags" "jsonld" $jsonld }}
+{{/* merge additions
+	----------------------------- */}}
+
+{{ $params := $s.Get "params" }}
+
+{{ if templates.Exists "partials/hugo-seo/AddTagData.html" }}
+  {{ $params = partial "hugo-seo/AddSEOData" (dict "seo" $params "Page" $) }}
+{{ end }}
+
+
+{{ $s.SetInMap "tags" "jsonld" ($s.Get "jsonld") }}
+{{ $s.SetInMap "tags" "meta" ($s.Get "meta") }}
+
 
 {{ return $s.Get "tags" }}
+  

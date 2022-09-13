@@ -1,32 +1,30 @@
 {{ $s := newScratch }}
+{{ $s.Set "meta" slice  }}
 
-{{ $s.Set "meta" dict  }}
-
-
-{{ $s.SetInMap "meta" "canonical" .canonical }}
+{{ $s.Add "meta" (dict "property" "canonical" "content" .canonical) }}
 
 {{ with .description }}
-{{ $s.SetInMap "meta" "description" . }}
+{{ $s.Add "meta" (dict "property" "description" "content" . ) }}
 {{ end }}
 
 {{ with .next }}
-  {{ $s.SetInMap "meta" "next" . }}
+{{ $s.Add "meta" (dict "property" "next" "content" . ) }}
 {{ end }}
 
 {{ with .prev }}
-  {{ $s.SetInMap "meta" "prev" . }}
+{{ $s.Add "meta" (dict "property" "prev" "content" . ) }}
 {{ end }}
 
 {{ with .alternativeOutputFormats }}
-  {{ $s.SetInMap "meta" "alternativeOutputFormats" . }}
+  {{ range . }}
+    {{ $s.Add "meta" (dict "rel" .Rel "type" .MediaType.Type "href" .Permalink "title" site.Title) }}
+  {{ end }}
 {{ end }}
 
-
-{{ $production := eq (getenv "HUGO_ENV") "production" }}
 {{ if (eq .private false) }}
-  {{ $s.SetInMap "meta" "robots" "index, follow" }}
+  {{ $s.Add "meta" (dict "property" "robots" "content" "index, follow" ) }}
 {{ else }}
-  {{ $s.SetInMap "meta" "robots" "noindex, nofollow" }}
+  {{ $s.Add "meta" (dict "property" "robots" "content"  "noindex, nofollow"  ) }}
 {{ end }}
 
 {{ return $s.Get "meta" }}
