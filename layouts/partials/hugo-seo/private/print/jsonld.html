@@ -1,3 +1,15 @@
+{{/* 
+	Print json-ld scruot tags from input
+	
+	@author @sean-au
+	
+	@access private
+
+  @context (slice $json-ldMap $json-ldMap etc)
+
+	@example {{ partial "hugo-seo/private/print/json-ld" . }}
+
+ */}}
 {{- range . }}
 <script type="application/ld+json">
 {{ . | jsonify (dict "indent" "  ") | safeJS }}

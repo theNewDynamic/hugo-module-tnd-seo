@@ -1,9 +1,26 @@
-{{- range $key, $value :=. }}
-  {{- if eq $key "alternativeOutputFormats" }}
-    {{- range $value }}
-{{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink site.Title | safeHTML }}
-    {{- end }}
-  {{- else }}
-{{ printf `<meta name="%s" content="%s">` $key $value | safeHTML }}
-  {{- end }}
-{{- end }}
+{{/* 
+	Print meta tags from inpt
+	
+	@author @sean-au
+	
+	@access private
+
+  @context (slice (dict "prop" "value" "prop" "value" etc.)
+	
+  Recursive nature handles nested slices
+
+	@example {{ partial "hugo-seo/private/print/meta" . }}
+
+ */}}
+{{- if reflect.IsSlice . -}}
+  {{- range . -}}
+    {{- partial "hugo-seo/private/print/meta" . -}}
+  {{- end -}}
+{{- else -}}
+  {{- $array := slice -}}
+  {{- range $key, $value := . -}}
+    {{- $array = $array | append (printf `%s="%s"` $key $value) -}}
+  {{- end -}}
+{{ printf "<meta %s>" (delimit $array " ") | safeHTML }}
+{{- end -}}
+

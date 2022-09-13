@@ -1,3 +1,15 @@
+{{/* 
+	Public partial for seo tag generation
+	
+	@author @sean-au
+	
+	@access public
+
+  @context page
+
+	@example {{ partial "hugo-seo/tags" . }}
+
+ */}}
 {{- /* get params from context */ -}}
 {{- $params := partial "hugo-seo/private/params.html" . -}}
 {{- /* generate tag data based on params and config */ -}}
