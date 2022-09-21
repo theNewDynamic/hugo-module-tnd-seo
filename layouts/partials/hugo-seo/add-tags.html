@@ -29,4 +29,14 @@
 	@example see: https://github.com/theNewDynamic/hugo-module-tnd-seo/blob/main/README.md#example
  */}}
 
-{{ return merge .seo dict }}
+{{ $s := newScratch }}
+{{ $s.Set "jsonld" slice }}
+{{ $s.Set "meta" slice }}
+
+
+
+{{ $tags := (dict 
+  "jsonld" ($s.Get "jsonld")
+  "meta" ($s.Get "meta")
+  ) }}
+{{ return $tags }}
