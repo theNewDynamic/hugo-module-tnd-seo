@@ -1,6 +1,6 @@
 {
   "name": "hugo-seo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Manage all of your Hugo SEO needs from one place!",
   "main": "layouts/partials/hugo-seo/tags.html",
   "scripts": {

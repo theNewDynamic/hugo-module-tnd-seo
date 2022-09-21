@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.3](https://github.com/future-wd/hugo-seo/compare/v1.0.2...v1.0.3) (2022-09-21)
+
+
+### Bug Fixes
+
+* conditionally add .Section to OG ([c4f3264](https://github.com/future-wd/hugo-seo/commit/c4f3264b369a3ef9718ee9fefb3baea4cc3895b4))
+
 ### [1.0.2](https://github.com/future-wd/hugo-seo/compare/v1.0.1...v1.0.2) (2022-09-21)
 
 
