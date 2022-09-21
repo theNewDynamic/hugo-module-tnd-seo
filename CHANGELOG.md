@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.2](https://github.com/future-wd/hugo-seo/compare/v1.0.1...v1.0.2) (2022-09-21)
+
+
+### Bug Fixes
+
+* add siteTitle to params ([0cabc2a](https://github.com/future-wd/hugo-seo/commit/0cabc2abf054ef4cec7ba75ff35bbb3a03b9425f))
+* change format ([338eacf](https://github.com/future-wd/hugo-seo/commit/338eacf41f4399568061891b759903911c9980ff))
+* change if to with ([1983782](https://github.com/future-wd/hugo-seo/commit/198378284da8f93a32192ff64a72a820942126a3))
+* change name and format ([40b96cc](https://github.com/future-wd/hugo-seo/commit/40b96ccc56f1607ffc3e4d799cd9dcea54bc3b8a))
+* minor bugs ([9c3ccd9](https://github.com/future-wd/hugo-seo/commit/9c3ccd9039a83fef7af05fe7b6a801766f052e05))
+* update title_tag and site_name ([d5d4270](https://github.com/future-wd/hugo-seo/commit/d5d4270635902a393adc38d7afb824ae1a960072))
+* working ([1d5de48](https://github.com/future-wd/hugo-seo/commit/1d5de484ed3b446f85481b70c68f553da9b5ff83))
+
 ### [1.0.1](https://github.com/future-wd/hugo-seo/compare/v1.0.0...v1.0.1) (2022-09-12)
 
 
