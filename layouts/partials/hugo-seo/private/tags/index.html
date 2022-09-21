@@ -37,11 +37,10 @@
 {{/* merge additions
 	----------------------------- */}}
 
-{{ $params := $s.Get "params" }}
+{{ $extra := partial "partials/hugo-seo/add-tags.html" . }}
+{{ $s.Add "jsonld" $extra.jsonld }}
+{{ $s.Add "meta" $extra.meta }}
 
-{{ if templates.Exists "partials/hugo-seo/AddTagData.html" }}
-  {{ $params = partial "hugo-seo/AddSEOData" (dict "seo" $params "Page" $) }}
-{{ end }}
 
 
 {{ $s.SetInMap "tags" "jsonld" ($s.Get "jsonld") }}
