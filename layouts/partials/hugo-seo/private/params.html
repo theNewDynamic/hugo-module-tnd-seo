@@ -99,10 +99,10 @@
   "|" title seperator is configured @ site.Params.seo.titleSeparator */}}
 {{ if not .IsHome }}
 	{{/* 1. All except home page */}}
-	{{  $s.SetInMap "params" "title_tag" (printf "%s %s %s" $title $config.titleSeparator site.Title)  }}
+	{{  $s.SetInMap "params" "title_tag" (printf "%s %s %s" $title $config.titleSeparator $siteTitle)  }}
 {{ else }}
 	{{/* 2. Home page */}}
-	{{ $s.SetInMap "params" "title_tag" site.Title }}
+	{{ $s.SetInMap "params" "title_tag" $siteTitle }}
 {{ end }}
 
 {{/* Site Name 
@@ -110,7 +110,7 @@
 {{ with $config.siteName }}
 	{{ $s.SetInMap "params" "site_name" . }}
 {{ else }}
-	{{ $s.SetInMap "params" "site_name" site.Title  }}
+	{{ $s.SetInMap "params" "site_name" $siteTitle  }}
 {{ end }}
 
 {{/* Image
