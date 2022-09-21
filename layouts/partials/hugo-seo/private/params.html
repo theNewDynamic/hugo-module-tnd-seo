@@ -89,6 +89,7 @@
 {{ else }}
   {{ $siteTitle = site.Params.Title }}
 {{ end }}
+{{ $s.SetInMap "params" "siteTitle" $siteTitle }}
  
 {{/* Title Tag
   ---------------------------- 
