@@ -167,8 +167,8 @@
 
 {{ with $img }}
 	{{ $s.SetInMap "params" "image" ( . | absURL) }}
-  {{ with $imgRes.Height }}
-    {{ $s.SetInMap "params" "image_height" ( . | string) }}
+  {{ if $imgRes.Height }}
+    {{ $s.SetInMap "params" "image_height" ( $imgRes.Height | string) }}
     {{ $s.SetInMap "params" "image_width" ( $imgRes.Width | string) }}
     {{ $s.SetInMap "params" "image_type" $imgRes.MediaType }}
   {{ else }}
