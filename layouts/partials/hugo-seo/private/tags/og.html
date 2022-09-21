@@ -6,7 +6,10 @@
 {{ $s.Add "og" (dict "property" "og:locale" "content" .locale) }}
 {{ $s.Add "og" (dict "property" "og:site_name" "content" .site_name) }}
 {{ $s.Add "og" (dict "property" "og:type" "content" .ogType) }}
-{{ $s.Add "og" (dict "property" "og:section" "content" .section) }}
+
+{{ with .section }}
+{{ $s.Add "og" (dict "property" "og:section" "content" .) }}
+{{ end }}
 
 {{ with .description }}
   {{ $s.Add "og" (dict "property" "og:description" "content" . ) }}
