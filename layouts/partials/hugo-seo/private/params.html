@@ -336,4 +336,8 @@
   {{ $s.SetInMap "params" "parent" . }} 
 {{ end }}
 
+{{/* must be at end of this file as depends on params defined higher up */}}
+{{ $breadcrumbs := partial "hugo-seo/private/utils/create-breadcrumbs" ($s.Get "params") }}
+{{ $s.SetInMap "params" "breadcrumbs" $breadcrumbs }}
+
 {{ return $s.Get "params" }}
