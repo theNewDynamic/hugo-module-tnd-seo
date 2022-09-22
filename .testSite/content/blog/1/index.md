@@ -7,6 +7,7 @@ seo:
 author:
   name: Test Name
   url: https://www.google.com
+  twitter: handle
 ---
 
 1st post

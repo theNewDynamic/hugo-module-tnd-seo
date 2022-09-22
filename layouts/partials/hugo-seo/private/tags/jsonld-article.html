@@ -13,15 +13,15 @@
 {{ $s.SetInMap "article" "image" . }}
 {{ end }}
 
-{{ with .wordcount }}
+{{ with .page.WordCount }}
   {{ $s.SetInMap "article" "wordcount" . }}
 {{ end }}
 
-{{ with .published_time }}
+{{ with .datePublished }}
   {{ $s.SetInMap "article" "datePublished" . }}
 {{ end }}
 
-{{ with .modified_time }}
+{{ with .dateModified }}
   {{ $s.SetInMap "article" "dateModified" . }}
 {{ end }}
 
@@ -30,7 +30,9 @@
   {{ range . }}
     {{ $author := (dict "@type" "Person") }}
     {{ range $key, $value := . }}
+      {{ if or (eq $key "name") (eq $key "url") }}
       {{ $author = merge $author (dict $key $value) }}
+      {{ end }}
     {{ end }}
     {{ $authors = $authors | append $author }}
   {{ end }}
