@@ -1,13 +1,14 @@
 {{ $s := newScratch }}
 {{ $s.Set "tags" dict }}
+{{ $s.Set "meta" slice }}
+{{ $s.Set "jsonld" slice }}
+
 
 {{ if eq site.Params.seo.generate.title true }}
   {{ $s.SetInMap "tags" "title" .title_tag }}
 {{ end }}
 
 {{/* set meta tags for standard meta, og, twitter */}}
-{{ $s.Set "meta" slice }}
-
 {{ if eq (.page.Param "seo.generate.meta") true }}
   {{ $s.Add "meta" (partial "hugo-seo/private/tags/meta" . ) }}
 {{ end }}
@@ -21,8 +22,6 @@
 {{ end }}
 
 {{/* add json-ld code blocks */}}
-{{ $s.Set "jsonld" slice }}
-
 {{/* only display article for .json article types and not list pages, if enabled */}}
 {{ if eq (.page.Param "seo.generate.jsonld.article") true }}
   {{ if and .jsonldType (not .page.IsNode) }}
