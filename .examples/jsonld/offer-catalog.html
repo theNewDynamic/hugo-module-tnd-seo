@@ -1,0 +1,46 @@
+{{/* 
+  offer-catalog.html example partial
+
+	@author  Sean Emerson @sean-au
+	
+	@access public
+
+	@context params as per readme, page available in .page, site in site
+
+	@example usage - see add-tags.html
+  
+  @example frontmatter for page in /content/services
+
+  --- 
+  title: Service 1
+  description or summary: Short summary of service 
+  seo:
+    title: Optional title for SEO only
+    description: Optional description for SEO only
+  ---
+  */}}
+{{- $s := newScratch }}
+{{ $s.Set "offer" dict }}
+
+{{ $s.SetInMap "offer" "@context" "https://schema.org" }}
+{{ $s.SetInMap "offer" "@type" "OfferCatalog" }}
+{{ $s.SetInMap "offer" "name" .siteTitle }}
+{{ $s.SetInMap "offer" "@id" site.Data.schema.id }}
+
+{{ $s.Set "list" slice }}
+
+{{ $services := where site.RegularPages "Section" "services" }}
+
+{{ range $services }}
+{{ $s.Add "list" (dict
+  "@type" "ListItem"
+  "name" .Title
+  "Description" .description
+  "url" .Permalink
+  ) }}
+{{ end }}
+
+{{ $s.SetInMap "offer" "itemListElement" ($s.Get "list") }}
+
+
+{{ return $s.Get "offer" }}
