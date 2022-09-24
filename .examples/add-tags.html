@@ -1,0 +1,25 @@
+{{ $s := newScratch }}
+{{ $s.Set "jsonld" slice }}
+{{ $s.Set "meta" slice }}
+{{/* keep text above this line 
+    *****************************/}}
+
+{{/* import jsonld objects here */}}
+{{ $s.Add "jsonld" (partial "hugo-seo/jsonld/local-business" . ) }}
+{{ $s.Add "jsonld" (partial "hugo-seo/jsonld/offer-catalog" . ) }}
+
+{{/* conditional import examples */}}
+{{ if eq .page.Section "event" }}
+  {{ $s.Add "jsonld" (partial "hugo-seo/jsonld/event" . ) }}
+{{ end }} 
+
+{{ if site.IsHome }}
+  {{ $s.Add "jsonld" (partial "hugo-seo/jsonld/faq" . ) }}
+{{ end }}
+
+{{/* keep text below this line  */}}
+{{ $tags := (dict
+  "jsonld" ($s.Get "jsonld")
+  "meta" ($s.Get "meta")
+  ) }}
+{{ return $tags }}
