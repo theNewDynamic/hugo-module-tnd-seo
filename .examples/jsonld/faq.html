@@ -1,0 +1,44 @@
+{{/* 
+  faq.html example partial
+
+	@author  Sean Emerson @sean-au
+	
+	@access public
+
+	@context params as per readme, page available in .page, site in site
+
+	@example usage - see add-tags.html
+  
+  @example frontmatter to generate faq json-ld:
+
+  --- 
+  title: Home
+  params:
+    faqItems:
+    - question: Question 1 text 
+      answer: Question 1 answer
+    - question: Question 2 text 
+      answer: Question 2 answer
+  ---
+  */}}
+{{ $s := newScratch }}
+{{ $s.Set "faq" dict }}
+{{ $s.Set "mainEntityItems" slice }}
+
+{{ $s.SetInMap "faq" "@context" "https://schema.org" }}
+
+{{ range .Params.faqItems }}
+  {{ $item = (dict 
+    "@type" "Question"
+    "name" .question
+    "acceptedAnswer" (dict
+      "@type": "answer"
+      "text": .answer
+      )
+    )}}
+  {{ $s.SetInMap "mainEntityItems" (slice $item) }}
+{{ end }}
+
+{{ $s.SetInMap "faq" "mainEntity" ($s.Get "mainEntityItems") }}
+
+{{ return $s.Get "faq" }}
