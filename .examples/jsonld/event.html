@@ -1,0 +1,45 @@
+{{- $s := newScratch }}
+{{ $s.Set "event" dict }}
+
+{{ $s.SetInMap "event" "@context" "https://schema.org" }}
+{{ $s.SetInMap "event" "@type" "Event" }}
+
+{{ $s.Set "event" "name" .Title }}
+{{ $s.Set "event" "eventAttendanceMode" "https://schema.org/OfflineEventAttendanceMode" }}
+{{ $s.Set "event" "description" .Summary }}
+
+{{ with index .Params.images 0 }}
+  {{ $image = (slice .Relpermalink) }}
+  {{ $s.Set "event" "image" $image }}
+{{ end }}
+
+
+{{- with site.Data.schema -}}
+  {{ with .postalAddress -}}
+    {{- $s.SetInMap "location" "@type" "Place" -}}
+    {{- with .streetAddress -}}
+      {{- $s.SetInMap "location" "streetAddress" (delimit . ", ") -}}
+    {{ end }}
+    {{- with .addressLocality -}}
+      {{- $s.SetInMap "location" "addressLocality" . -}}
+    {{- end -}}
+    {{- with .addressRegion -}}
+      {{- $s.SetInMap "location" "addressRegion" . -}}
+    {{- end -}}
+    {{- with .postalCode -}}
+      {{- $s.SetInMap "location" "postalCode" . -}}
+    {{- end -}}
+    {{- with .addressCountry | default "Australia" -}}
+      {{- $s.SetInMap "location" "addressCountry" . -}}
+    {{- end -}}
+    {{ $s.SetInMap "event" "location" ($s.Get "location") }}
+  {{ end }}
+{{ end }}
+
+{{ $s.SetInMap "event" "organizer" (dict
+  "@type" "Organization"
+  "name" site.Title
+  "url" site.BaseURL
+  "@id" site.Data.schema.id) }}
+
+{{ return $s.Get "event" }}

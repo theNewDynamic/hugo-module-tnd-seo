@@ -1,0 +1,90 @@
+{{- $s := newScratch }}
+{{ $s.Set "org" dict }}
+{{- /* https://developers.google.com/search/docs/advanced/structured-data/local-business */ -}}
+{{- with site.Data.schema -}}
+  {{- /* organisation schema */ -}}
+  {{- $s.SetInMap "org" "@context" "https://schema.org" -}}
+  {{- $s.SetInMap "org"  "@type" .type  -}}
+  {{ with .id -}}
+  {{- $s.SetInMap "org"  "@id" .  -}}
+  {{ end }}
+  {{ with .areaServed }}
+    {{ $s.Set "area" slice }}
+    {{ range . }}
+    {{- $s.Add "area" (dict "@type" .type "name" .name "@id" .id) -}}
+    {{ end }}
+    {{- $s.SetInMap "org" "areaServed" ($s.Get "area") -}}
+  {{ end }}
+  {{- $s.SetInMap "org" "url" site.BaseURL -}}
+  {{- $s.SetInMap "org" "logo" (.logo | absURL ) -}}
+  {{- $s.SetInMap "org" "name" site.Title -}}
+  {{ with .images -}}
+    {{- $images := slice -}}
+    {{- range  . -}}
+      {{ with $image := resources.GetMatch . }}
+      {{ $images = $images | append $image.Permalink }}
+      {{ end }}
+    {{- end }}
+    {{- $s.SetInMap "org" "image" $images  -}}
+  {{ end -}}
+  {{ with .social -}}
+    {{ $socials := slice}}
+    {{- range . -}}
+    {{ $socials = $socials | append .url }}
+    {{- end -}}
+    {{- $s.SetInMap "org" "sameAs" $socials -}}
+  {{ end -}}
+  {{ with .postalAddress -}}
+    {{- $s.SetInMap "address" "@type" "PostalAddress" -}}
+    {{- with .streetAddress -}}
+      {{- $s.SetInMap "address" "streetAddress" (delimit . ", ") -}}
+    {{ end }}
+    {{- with .addressLocality -}}
+      {{- $s.SetInMap "address" "addressLocality" . -}}
+    {{- end -}}
+    {{- with .addressRegion -}}
+      {{- $s.SetInMap "address" "addressRegion" . -}}
+    {{- end -}}
+    {{- with .postalCode -}}
+      {{- $s.SetInMap "address" "postalCode" . -}}
+    {{- end -}}
+    {{- with .addressCountry | default "Australia" -}}
+      {{- $s.SetInMap "address" "addressCountry" . -}}
+    {{- end -}}
+    {{- $s.SetInMap "org" "address" ($s.Get "address") -}}
+  {{ end -}}
+  {{ with .geo -}}
+    {{ $geo := (dict
+      "@type" "GeoCoordinates"
+      "latitude" .latitude
+      "longitude" .longitude
+      )}}
+    {{- $s.SetInMap "org" "geo" $geo -}}
+  {{ end -}}
+  {{- with .telephone -}}
+    {{- with (index . 0) -}}
+      {{- $s.SetInMap "org" "telephone" .text -}}
+    {{- end -}}
+  {{ end -}}
+  {{ with .email -}}
+  {{- $s.SetInMap "org" "email" .text -}}
+  {{ end -}}
+  {{ with .priceRange -}}
+    {{- $s.SetInMap "org" "priceRange" . -}}
+  {{ end -}}
+  {{ with .openingHoursSpecification.days -}}
+    {{ range . -}}
+      {{- if and (not .custom) (and .opens .closes) -}}
+        {{- $day := (dict
+          "@type" "OpeningHoursSpecification"
+          "dayOfWeek" (slice .dayOfWeek)
+          "opens" (time.Format "15:04" .opens)
+          "closes" (time.Format "15:04" .closes) ) -}}
+        {{- $s.Add "days" (slice $day) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $s.SetInMap "org" "openingHoursSpecification" ($s.Get "days") -}}
+  {{ end -}}
+{{ end -}}
+
+{{ return $s.Get "org" }}
