@@ -1,0 +1,13 @@
+{{ $s := newScratch }}
+{{ $s.Set "itemList" slice }}
+{{ $s.Set "itemCount" 1 }}
+
+{{ partial "hugo-seo/private/utils/breadcrumb-recursive" (dict "scratch" $s "parent" .parent) }}
+
+{{ $s.Add  "itemList" (slice (dict 
+  "@type" "ListItem"
+  "name" .title
+  "position" ($s.Get "itemCount")
+)) }}
+
+{{ return $s.Get "itemList" }}
