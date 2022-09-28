@@ -1,0 +1,33 @@
+{{ $s := newScratch }}
+{{ $s.Set "event" dict }}
+
+
+{{ $s.SetInMap "event" "@context"  "https://schema.org" }}
+{{ $s.SetInMap "event" "@type" "event" }}
+{{ $s.SetInMap "event" "url" .canonical }}
+{{ $s.SetInMap "event" "name" .title }}
+{{ $s.SetInMap "event" "description" .description }}
+
+
+{{ with .image }}
+{{ $s.SetInMap "event" "image" . }}
+{{ end }}
+
+
+
+{{ with .organizer }}
+  {{ $authors := slice }}
+  {{ range . }}
+    {{ $author := (dict "@type" "Person") }}
+    {{ range $key, $value := . }}
+      {{ if or (eq $key "name") (eq $key "url") }}
+      {{ $author = merge $author (dict $key $value) }}
+      {{ end }}
+    {{ end }}
+    {{ $authors = $authors | append $author }}
+  {{ end }}
+  {{ $s.SetInMap "event" "authors" $authors }}
+{{ end }}
+
+
+{{ return $s.Get "event"  }}
