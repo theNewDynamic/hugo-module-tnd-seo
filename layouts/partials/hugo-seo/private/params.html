@@ -28,12 +28,12 @@
 	----------------------------- */}}
 
 {{  if not .PublishDate.IsZero  }}
-{{  $s.SetInMap "params" "published_time" (.PublishDate.Format "2006-01-02T15:04:05-07:00")  }}
+{{  $s.SetInMap "params" "datePublished" (.PublishDate.Format "2006-01-02T15:04:05-07:00")  }}
 {{  else if not .Date.IsZero  }}
-{{  $s.SetInMap "params" "published_time" (.Date.Format "2006-01-02T15:04:05-07:00")  }}
+{{  $s.SetInMap "params" "datePublished" (.Date.Format "2006-01-02T15:04:05-07:00")  }}
 {{  end  }}
 {{  if not .Lastmod.IsZero  }}
-{{  $s.SetInMap "params" "modified_time" (.Lastmod.Format "2006-01-02T15:04:05-07:00")  }}
+{{  $s.SetInMap "params" "dateModified" (.Lastmod.Format "2006-01-02T15:04:05-07:00")  }}
 {{  end  }}
 
 {{/* Description
@@ -105,53 +105,45 @@
 	{{ $s.SetInMap "params" "title_tag" $siteTitle }}
 {{ end }}
 
-{{/* Site Name 
-	---------------------------- */}}
-{{ with $config.siteName }}
-	{{ $s.SetInMap "params" "site_name" . }}
-{{ else }}
-	{{ $s.SetInMap "params" "site_name" $siteTitle  }}
-{{ end }}
-
 {{/* Image
 	---------------------------- */}}
 {{ $img := false }}
-{{ $imgRes := false }}
 
-{{  with .Params.seo.image  }}
-  {{ with $.Resources.GetMatch . }}
-	  {{  $img = .RelPermalink  }}
-    {{ $imgRes = . }}
-  {{ else }}
-    {{  $img = .  }}
-  {{ end }}
+{{ with .Params.seo.image }}
+  {{  $img = . }}
 {{ else }}
-	{{/* If no SEO IMAGE is set, we look for the .Params.images slice
-		and use the first one  */}}
+  {{/* If no SEO IMAGE is set, we look for the .Params.images slice
+    and use the first one  */}}
   {{ with .Params.images  }}
     {{ with index . 0  }}
-      {{ with $.Resources.GetMatch . }}
-        {{ $imgRes = . }}
-        {{  $img = .RelPermalink  }}
-      {{ else }}
-        {{  $img = .  }}
-      {{ end }}
+      {{ $img = . }}
     {{ end }}
-  {{  end  }}
-{{  end  }}
+  {{ else }}
+    {{ with .Params.image  }}
+      {{ $img = . }}
+    {{ end }}
+  {{ end }}
+{{  end }}
 
 {{/* if image isnt found via page seo.image or .images array, use site config */}}
 {{ if not $img }}
   {{ with $config.seo.image }}
-    {{ with resources.GetMatch . }}
-      {{ $imgRes = . }}
-      {{  $img = .RelPermalink  }}
-    {{ else }}
-      {{  $img = .  }}
-    {{ end }}
+    {{  $img = . }}
   {{ end }}
 {{ end }}
 	
+{{/* check if image is a page or global resource
+  assign the permalink to $img and assign resource to $imgRes */}}
+{{ $imgRes := false }}
+{{ with resources.GetMatch $img }}
+  {{ $imgRes = . }}
+  {{ $img = .RelPermalink  }}
+{{ else }}
+  {{ with .Resources.GetMatch $img }}
+    {{ $imgRes = . }}
+    {{ $img = .RelPermalink  }}
+  {{ end }}
+{{ end }}
 
 
 {{/* Finally if after all of the conditional above we are not able to find an image for the page,
@@ -168,17 +160,15 @@
 {{ with $img }}
 	{{ $s.SetInMap "params" "image" ( . | absURL) }}
   {{ if $imgRes.Height }}
-    {{ $s.SetInMap "params" "image_height" ( $imgRes.Height | string) }}
-    {{ $s.SetInMap "params" "image_width" ( $imgRes.Width | string) }}
-    {{ $s.SetInMap "params" "image_type" $imgRes.MediaType }}
+    {{ $s.SetInMap "params" "imageHeight" ( $imgRes.Height | string) }}
+    {{ $s.SetInMap "params" "imageWidth" ( $imgRes.Width | string) }}
+    {{ $s.SetInMap "params" "imageType" $imgRes.MediaType }}
   {{ else }}
     {{ $data := imageConfig $img }} 
-    {{ $s.SetInMap "params" "image_height" ($data.Height | string) }}
-    {{ $s.SetInMap "params" "image_width"  ($data.Height | string) }}
+    {{ $s.SetInMap "params" "imageHeight" ($data.Height | string) }}
+    {{ $s.SetInMap "params" "imageWidth"  ($data.Height | string) }}
   {{ end }}
 {{ end }}
-
-
 
 
 {{/* We check for the private param 
@@ -237,14 +227,20 @@
 {{ end }}
 
 {{/* We check the site config sports a Social.twitter and use as handle */}}
-{{  with .Site.Social.twitter  }}
+{{  with site.Social.twitter  }}
 	{{  $s.SetInMap "params" "twitter_site" (printf "@%s" .)  }}
 {{  end  }}
 
 {{/* We check the page params have author.twitter and use as handle */}}
-{{  with .Params.author.twitter  }}
-	{{  $s.SetInMap "params" "twitter_creator" (printf "@%s" .)  }}
-{{  end  }}
+{{ with .Params.authors }}
+  {{ with index . 0 }}
+    {{  $s.SetInMap "params" "twitter_creator" (printf "@%s" .)  }}
+  {{ end }}
+{{ else }}
+  {{  with .Params.author.twitter  }}
+    {{  $s.SetInMap "params" "twitter_creator" (printf "@%s" .)  }}
+  {{ end }}
+{{ end }}
 
 
 
@@ -257,10 +253,6 @@
   {{  $s.SetInMap "params" "ogType" "article"  }}
 {{ else }}
   {{  $s.SetInMap "params" "ogType" "website" }}
-{{ end }}
-
-{{ with .Section }}
-  {{  $s.SetInMap "params" "section" .  }}
 {{ end }}
 
 {{- with .Params.audio }}
@@ -277,7 +269,7 @@
   {{  $s.SetInMap "params" "video" ( . | absURL)  }} />
 {{ end }}
 
-{{ $related := where (site.RegularPages.Related .) "Section" .Section | first 6 }}
+{{ $related := site.RegularPages.Related . | first 6 }}
 {{ if not $related }}
 {{ $related = where site.RegularPages.ByDate "Section" .Section | first 6 }}
 {{ end }}
@@ -311,12 +303,12 @@
 {{ end }}
 
 {{/* remove /n from end of plainified content */}}
-{{ $articleBody := trim (.Content | plainify ) "\n" }}
-{{  $s.SetInMap "params" "articleBody" $articleBody  }}
+{{/* $articleBody := trim (.Content | plainify ) "\n" */}}
+{{/*  $s.SetInMap "params" "articleBody" $articleBody  */}}
 
-{{ with .WordCount }}
-  {{  $s.SetInMap "params" "wordcount" .  }}
-{{ end }}
+{{/* article body plain text */}}
+{{ $articleBody := trim .Plain "\n" }}
+{{  $s.SetInMap "params" "articleBody" $articleBody }}
 
 {{ $authors := slice }}
 {{ with .Params.authors }}
@@ -329,11 +321,6 @@
 
 {{ with $authors }}
 {{ $s.SetInMap "params" "authors" .  }}
-{{ end }}
-
-
-{{ with .Parent }}
-  {{ $s.SetInMap "params" "parent" . }} 
 {{ end }}
 
 {{/* must be at end of this file as depends on params defined higher up */}}

@@ -199,3 +199,43 @@ Originally forked from tnd-seo by [thenewDynamic](https://www.thenewdynamic.com)
 Log an error or feature request as an issue.
 
 PR's are welcome.
+
+
+### Params
+
+The following parameters are in the current context when creating a custom json-ld type.
+
+Variable are in camelCase form if matching a json-ld property. Otherwise they take the form of their purpose e.g. twitter or og variable name.
+
+| Variable          | Description | Source |
+| ----------------- | ----------- | ------ |
+| .page             | access to the current page context | .Page |
+| site              | hugo function for accessing .Site context | reference only |
+| .datePublished    | ISO datestamp publish time | .PublishDate, .Date |
+| .dateModified     | ISO datestamp of modified time |.Lastmod |
+| .description      | Page description plain text | .Params.seo.description, .Description, .Summary, site.Params.seo.description, site.Params.description |
+| .title            | Page title | .Params.seo.title, .Title |
+| .siteTitle        | Site Title | site.Title, site.Params.title |
+| .image            | absURL of page image | .Params.seo.image, index (.Params.images) 0, .Params.image, site.Params.seo.image (static file, page resource or global resource) |
+| .imageHeight      | height of image | image variable above |
+| .imageWidth       | width of image | image variable above |
+| .imageType        | mime type of image if page or global resource | image variable above |
+| .private          | boolean | .Params.seo.private, site.Params.seo.private |
+| .locale           | site language code | .Lang |
+| .canonical        | canonical absUrl  | page: .Params.seo.canonical, .Permalink |
+| -                 | -                 | node: .Paginator.URL |
+| .next             | next page absURL if node | .Paginator.Next.URL |
+| .prev             | prev page absURL if node | .Paginator.Prev.URL |
+| .alternativeOutputFormats | alternative output formats array | .AlternativeOutputFormats |
+| .twitter_card     | summary or summary_large_image | if image has been set |
+| .twitter_site     | site twitter handle (with @) | site.Social.twitter (no @) |
+| .twitter_creator  | page author twitter handle (with @) | .twitter in .author or first .authors (no @) |
+| .ogType           | og page type | website or if .Section is in ogArticleTypes, article |
+| .audio            | page audio clip absURL | .Params.audio |
+| .video            | page video clip absURL | index (.Params.videos) 0, .Params.video |
+| .see_also         | array of related pages | first 6 related pages, then first 6 pages by date in same section |
+| .locale_alternate | array of translations of page | .Lang for each of .Translations  |
+| .jsonldType       | type of page for jsonld | if in .Section: jsonldArticleTypes > article, jsonldNewsArticleTypes > newsArticle, jsonldBlogPostingTypes > blogPosting |
+| .articleBody      | page body plain text | .Plain |
+| .authors          | slice of authors | .Params.authors, .Params.author (provide name and url, optionally twitter) |
+| .breadcrumbs      | breadcrumbs array | current page and parents |
