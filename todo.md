@@ -11,3 +11,5 @@ option to add meta tags or json-ld
 create example partial with logic for per page, per .Type, per .Section or general
 
 docs for adding partial to site, not module
+
+
